@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work — Frey</title>
+<meta name="description" content="Frey · Work — engineering works & paintings.">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/syne-800.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-grotesk-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-mono-400.woff2">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/work.css">
+</head>
+<body data-theme="dark">
+
+    <div id="loader" aria-hidden="true">
+    <div class="loader__scene">
+      <div class="loader__rope"></div>
+      <div class="loader__pendant"></div>
+      <div class="loader__word">
+        <span>W</span>
+        <span>O</span>
+        <span>R</span>
+        <span>K</span>
+        <span class="loader__gem">✦</span>
+      </div>
+    </div>
+    <div class="loader__meta">
+      <span class="loader__label">engineering · paintings</span>
+      <span class="loader__bar"><i></i></span>
+      <span class="loader__pct">000</span>
+    </div>
+  </div>
+<div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <header class="site-head">
+    <a class="logo" href="index.html" aria-label="Frey home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="16" fill="currentColor" opacity="0.06"/><path d="M20 14h26v8H29v9h14v8H29v11h-9z" fill="currentColor"/><circle cx="46" cy="46" r="5" fill="#01847F"/></svg>
+      <b>Frey<i>✦</i></b>
+    </a>
+    <nav class="head-nav" aria-label="primary">
+      <a class="head-link" href="index.html">Index</a>
+      <a class="head-link is-active" href="work.html">Work</a>
+      <a class="head-link" href="hobby.html">Hobby</a>
+      <a class="head-link" href="ask.html">Ask</a>
+      <a class="head-cta" href="index.html#choose">选择页 ↑</a>
+    </nav>
+    <button class="head-burger" aria-label="menu"><i></i><i></i><i></i></button>
+  </header>
+  <div class="head-mobile">
+    <a href="index.html">Index<span>✦</span></a>
+    <a href="work.html">Work<span>✦</span></a>
+    <a href="hobby.html">Hobby<span>✦</span></a>
+    <a href="ask.html">Ask<span>✦</span></a>
+  </div>
+
+  <main>
+    <section class="work-hero section" data-reveal>
+      <div class="work-hero__bgtext display" aria-hidden="true">WORK</div>
+      <div class="wrap">
+        <p class="mono green">01 — WORK / PORTFOLIO</p>
+        <h1 class="work-hero__title display">我做过 &amp; 我画过<span class="green">.</span></h1>
+        <p class="work-hero__sub mono">滚动画廊 · 滚轮横向滑动 / scroll ↓ to explore</p>
+      </div>
+    </section>
+
+    <!-- ===== engineering ===== -->
+    <section id="eng" class="gallery section section--flush">
+      <header class="gallery__head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">02 — ENGINEERING / 工程作品</p>
+          <h2 class="gallery__title display">Things I built<span class="green">.</span></h2>
+        </div>
+        <div class="gallery__progress mono"><span class="g-progress-cur">01</span><i></i><span class="g-progress-total">06</span></div>
+      </header>
+
+      <div class="h-scroll" data-gallery>
+        <div class="h-scroll__inner">
+          <article class="p-card" data-reveal>
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#0A0D0C"/><rect x="30" y="30" width="120" height="80" fill="none" stroke="#01847F" stroke-width="2"/><rect x="170" y="30" width="120" height="80" fill="none" stroke="#2FC9BC" stroke-width="2"/><path d="M40 140h90M40 152h60M40 164h76" stroke="#9BE8E0" stroke-width="2"/><circle cx="260" cy="150" r="18" fill="#01847F"/></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">FreyOS</h3>
+              <p class="p-card__desc">一个长在浏览器里的个人终端：命令、天气、待办、随机诗句。</p>
+              <div class="p-card__tags mono"><span>web</span><span>vanilla js</span><span>2026</span></div>
+            </div>
+          </article>
+
+          <article class="p-card" data-reveal style="--d:.05s">
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#F5F6F1"/><g fill="none" stroke="#0A0D0C" stroke-width="2"><path d="M20 100 C 60 30, 120 170, 160 100 S 260 30, 300 100"/><path d="M20 120 C 60 50, 120 190, 160 120 S 260 50, 300 120"/></g><g fill="#01847F"><circle cx="160" cy="100" r="6"/><circle cx="70" cy="80" r="4"/><circle cx="250" cy="90" r="4"/></g></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">Waveform</h3>
+              <p class="p-card__desc">把声音画成曲线的生成式可视化，实时跟随麦克风。</p>
+              <div class="p-card__tags mono"><span>canvas</span><span>audio</span><span>2026</span></div>
+            </div>
+          </article>
+
+          <article class="p-card" data-reveal style="--d:.1s">
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#015A56"/><g fill="#0A0D0C"><circle cx="80" cy="60" r="34"/><rect x="170" y="40" width="60" height="60" rx="8"/><path d="M60 150 l26 -40 22 26 26 -36 28 50z"/></g><g fill="#9BE8E0"><rect x="250" y="150" width="14" height="14"/><rect x="270" y="150" width="14" height="14"/></g></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">Petal Kit</h3>
+              <p class="p-card__desc">表情与贴纸生成器：拖拽几何体，组合成你的专属小表情。</p>
+              <div class="p-card__tags mono"><span>svg</span><span>drag &amp; drop</span><span>2025</span></div>
+            </div>
+          </article>
+
+          <article class="p-card" data-reveal style="--d:.15s">
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#0A0D0C"/><g stroke="#2FC9BC" stroke-width="1.5" fill="none"><circle cx="160" cy="100" r="60"/><circle cx="160" cy="100" r="36"/><circle cx="160" cy="100" r="12"/></g><g fill="#F5F6F1"><circle cx="208" cy="66" r="4"/><circle cx="132" cy="140" r="4"/></g><path d="M160 100 L 212 62" stroke="#01847F" stroke-width="2"/></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">Orbit</h3>
+              <p class="p-card__desc">数据可视化组件库：一圈一圈，把数字变成轨道。</p>
+              <div class="p-card__tags mono"><span>data-viz</span><span>component</span><span>2025</span></div>
+            </div>
+          </article>
+
+          <article class="p-card" data-reveal style="--d:.2s">
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#F5F6F1"/><path d="M40 160 L 90 120 L 140 150 L 200 90 L 250 110 L 290 60" fill="none" stroke="#0A0D0C" stroke-width="2"/><g fill="#01847F"><circle cx="90" cy="120" r="6"/><circle cx="200" cy="90" r="6"/><circle cx="290" cy="60" r="6"/></g><rect x="40" y="40" width="70" height="34" fill="none" stroke="#2FC9BC" stroke-width="2"/><text x="52" y="62" font-size="14" fill="#015A56" font-family="monospace">hi</text></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">Tide</h3>
+              <p class="p-card__desc">极简天气插件：只有一条线和一个点，告诉你今天的心情。</p>
+              <div class="p-card__tags mono"><span>widget</span><span>minimal</span><span>2025</span></div>
+            </div>
+          </article>
+
+          <article class="p-card" data-reveal style="--d:.25s">
+            <div class="p-card__art">
+              <svg viewBox="0 0 320 200"><rect width="320" height="200" fill="#0A0D0C"/><g fill="#9BE8E0"><rect x="40" y="120" width="26" height="50"/><rect x="76" y="90" width="26" height="80"/><rect x="112" y="140" width="26" height="30"/><rect x="148" y="60" width="26" height="110"/><rect x="184" y="110" width="26" height="60"/><rect x="220" y="40" width="26" height="130"/></g><path d="M40 60 L 246 60" stroke="#01847F" stroke-width="2" stroke-dasharray="6 6"/></svg>
+            </div>
+            <div class="p-card__body">
+              <h3 class="p-card__title display">Lumi</h3>
+              <p class="p-card__desc">灯光装置的控制面板：用网页点亮 96 盏 LED 柱子。</p>
+              <div class="p-card__tags mono"><span>hardware</span><span>arduino</span><span>2024</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <p class="gallery__foot mono">滚轮 / 拖拽横向滑动 — 共 06 个项目</p>
+    </section>
+
+    <!-- ===== paintings ===== -->
+    <section id="paint" class="gallery gallery--paint section section--flush">
+      <header class="gallery__head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">03 — PAINTINGS / 绘画作品</p>
+          <h2 class="gallery__title display">Things I drew<span class="green">.</span></h2>
+        </div>
+        <div class="gallery__progress mono"><span class="g-progress-cur">01</span><i></i><span class="g-progress-total">06</span></div>
+      </header>
+
+      <div class="h-scroll" data-gallery>
+        <div class="h-scroll__inner">
+          <figure class="d-card" data-reveal>
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#015A56"/><stop offset="1" stop-color="#0A0D0C"/></linearGradient></defs><rect width="300" height="400" fill="url(#g1)"/><circle cx="150" cy="150" r="60" fill="#2FC9BC" opacity=".8"/><circle cx="150" cy="150" r="30" fill="#F5F6F1" opacity=".85"/><path d="M0 330 Q 80 280 150 320 T 300 300 L 300 400 L 0 400 Z" fill="#01847F" opacity=".9"/></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《月面》</span><span>digital · 2026</span></figcaption>
+          </figure>
+
+          <figure class="d-card" data-reveal style="--d:.05s">
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><defs><linearGradient id="g2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#F5F6F1"/><stop offset="1" stop-color="#D7F4F0"/></linearGradient></defs><rect width="300" height="400" fill="url(#g2)"/><path d="M60 320 C 90 200, 210 200, 240 320 Z" fill="#01847F"/><path d="M120 330 C 140 240, 180 240, 200 330 Z" fill="#F5F6F1"/><circle cx="200" cy="110" r="34" fill="#015A56"/><circle cx="232" cy="94" r="10" fill="#9BE8E0"/></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《山与月》</span><span>digital · 2026</span></figcaption>
+          </figure>
+
+          <figure class="d-card" data-reveal style="--d:.1s">
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><rect width="300" height="400" fill="#0A0D0C"/><g stroke="#2FC9BC" stroke-width="2" fill="none"><path d="M30 300 C 80 180, 130 350, 170 220 S 260 120, 270 60"/><path d="M30 330 C 80 210, 130 380, 170 250 S 260 150, 270 90"/></g><g fill="#01847F"><circle cx="60" cy="260" r="4"/><circle cx="120" cy="330" r="4"/><circle cx="230" cy="150" r="4"/></g></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《夜风》</span><span>vector · 2025</span></figcaption>
+          </figure>
+
+          <figure class="d-card" data-reveal style="--d:.15s">
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><rect width="300" height="400" fill="#F5F6F1"/><g fill="#0A0D0C"><rect x="40" y="60" width="60" height="60"/><rect x="120" y="60" width="60" height="60"/><rect x="200" y="60" width="60" height="60"/><rect x="80" y="140" width="60" height="60"/><rect x="160" y="140" width="60" height="60"/><rect x="40" y="220" width="60" height="60"/><rect x="120" y="220" width="60" height="60"/><rect x="200" y="220" width="60" height="60"/></g><g fill="#01847F"><rect x="200" y="140" width="60" height="60"/><rect x="80" y="300" width="60" height="60"/></g></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《格子》</span><span>vector · 2025</span></figcaption>
+          </figure>
+
+          <figure class="d-card" data-reveal style="--d:.2s">
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A0D0C"/><stop offset="1" stop-color="#015A56"/></linearGradient></defs><rect width="300" height="400" fill="url(#g5)"/><path d="M150 60 L 220 180 L 150 300 L 80 180 Z" fill="#F5F6F1"/><path d="M150 100 L 195 180 L 150 260 L 105 180 Z" fill="#01847F"/><circle cx="150" cy="180" r="22" fill="#9BE8E0"/></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《晶体》</span><span>digital · 2025</span></figcaption>
+          </figure>
+
+          <figure class="d-card" data-reveal style="--d:.25s">
+            <div class="d-card__frame">
+              <svg viewBox="0 0 300 400"><rect width="300" height="400" fill="#0A0D0C"/><path d="M60 60 C 120 140, 200 40, 240 120 C 260 160, 230 200, 250 240 C 270 290, 220 340, 180 340" fill="none" stroke="#2FC9BC" stroke-width="2.5"/><circle cx="60" cy="60" r="6" fill="#01847F"/><circle cx="180" cy="340" r="8" fill="#01847F"/><g fill="#F5F6F1" opacity=".8"><circle cx="220" cy="90" r="2"/><circle cx="90" cy="170" r="2"/><circle cx="160" cy="250" r="2"/></g></svg>
+            </div>
+            <figcaption class="d-card__cap mono"><span>《游丝》</span><span>vector · 2024</span></figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="gallery__foot mono">滚轮 / 拖拽横向滑动 — 共 06 幅画</p>
+    </section>
+  </main>
+
+  <footer class="outro" data-reveal>
+    <div class="wrap outro__inner">
+      <p class="outro__label mono"><span class="green">✦</span> next / 下一站</p>
+      <a class="outro__next display" href="hobby.html">
+        <span class="outro__next-t">Hobby</span><span class="outro__next-i" aria-hidden="true">↗</span>
+      </a>
+    </div>
+    <div class="wrap outro__bar">
+      <p class="outro__note mono">兴趣与热爱 · f1 · musicals · music</p>
+      <a class="outro__back mono" href="index.html#choose">← 回到选择页</a>
+    </div>
+  </footer>
+
+<script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/ui.js"></script>
+<script src="assets/js/work.js"></script>
+</body>
+</html>
+
+
+
+

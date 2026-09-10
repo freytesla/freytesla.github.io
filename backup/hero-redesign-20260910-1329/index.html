@@ -304,18 +304,7 @@
   window.FREY_NECKLACE_OPTIONS = {
     stageId: 'necklace', canvasId: 'necklace-canvas',
     sparkles: false, shadow: false, hud: false, bright: false, lightBg: true,
-    fitW: 5.2, fitH: 3.5, centerY: -1.4,
-    gravity: 16,          // 重力 g（演示页的滑块不受影响）
-    /* 吊坠物理参数（都可调）：
-       sway          回正力度（越大摆得越快）
-       damping       摆动阻尼（越大越快停）
-       inertia       惯性：拖链子时吊坠滞后/甩动幅度
-       twistSpring   绕竖轴扭转回正（越小越容易转）
-       twistDamping  扭转阻尼
-       maxOmega      角速度上限（防止疯转） */
-    pendulum: { sway: 17.0, damping: 3.5, inertia: 1.15, twistSpring: 1.2, twistDamping: 1.0, maxOmega: 20,
-                frontBack: 0.10, spin: 0.06, motionFreq: 0.85,
-                reversalBoost: 13.0, revDecay: 5.0 }
+    fitW: 5.2, fitH: 3.5, centerY: -1.0
   };
 </script>
 <script type="module" src="assets/js/necklace-physics.js"></script>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frey ✦ Hover Lab — 交互动效实验室</title>
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@300;400;500&family=Space+Mono&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#01847F; --green-600:#016E6A; --green-700:#015A56; --green-400:#2FC9BC;
+  --green-200:#9BE8E0; --green-100:#D7F4F0;
+  --ink:#0A0D0C; --bg:#050706; --bg-2:#0A0E0C; --paper:#F5F6F1; --paper-2:#ECEEE6;
+  --line:rgba(245,246,241,.12); --line-strong:rgba(245,246,241,.26);
+  --muted:rgba(245,246,241,.55);
+  --font-display:'Syne','Noto Sans SC',sans-serif;
+  --font-body:'Space Grotesk','Noto Sans SC',sans-serif;
+  --font-mono:'Space Mono','Noto Sans SC',monospace;
+  --space:clamp(20px,4vw,64px);
+  --ease:cubic-bezier(.22,.61,.21,1); --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{ background:var(--bg); color:var(--paper); font-family:var(--font-body); font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+::selection{ background:var(--green); color:#050706; }
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+::-webkit-scrollbar{ width:5px; height:5px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:var(--green-700); border-radius:99px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--green); }
+*{ scrollbar-width:thin; scrollbar-color:var(--green-700) transparent; }
+.mono{ font-family:var(--font-mono); }
+.green{ color:var(--green-400); }
+@media (pointer:fine){ body.has-cursor, body.has-cursor a, body.has-cursor button{ cursor:none; } }
+#cur-dot,#cur-ring{ position:fixed; top:0; left:0; pointer-events:none; z-index:9999; border-radius:50%; }
+#cur-dot{ width:6px; height:6px; background:var(--green-400); transform:translate(-50%,-50%); }
+#cur-ring{ width:34px; height:34px; border:1px solid rgba(245,246,241,.6); transform:translate(-50%,-50%); transition:width .25s var(--ease),height .25s var(--ease),border-color .25s; mix-blend-mode:difference; }
+body.cur-on #cur-ring{ width:52px; height:52px; border-color:var(--green-400); }
+.site-head{ position:fixed; top:0; left:0; right:0; z-index:900; display:flex; align-items:center; justify-content:space-between; padding:18px var(--space); background:rgba(5,7,6,.72); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+.logo{ font-family:var(--font-display); font-weight:800; font-size:20px; letter-spacing:-.02em; }
+.logo i{ font-style:normal; color:var(--green-400); }
+.head-nav{ display:flex; gap:clamp(14px,2.4vw,30px); align-items:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; }
+.head-nav a{ color:var(--muted); transition:color .25s; position:relative; padding:6px 0; }
+.head-nav a:hover{ color:var(--paper); }
+.head-nav a::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:1px; background:var(--green-400); transform:scaleX(0); transform-origin:left; transition:transform .35s var(--ease); }
+.head-nav a:hover::after{ transform:scaleX(1); }
+.head-cta{ border:1px solid var(--line-strong); border-radius:99px; padding:8px 16px; color:var(--green-200); transition:all .3s var(--ease); }
+.head-cta:hover{ background:var(--green); border-color:var(--green); color:#050706; }
+.hero{ min-height:88vh; display:flex; flex-direction:column; justify-content:center; padding:120px var(--space) 60px; position:relative; overflow:hidden; }
+.hero__bg{ position:absolute; right:-4vw; top:50%; transform:translateY(-50%); font-family:var(--font-display); font-weight:800; font-size:clamp(120px,26vw,360px); letter-spacing:-.05em; color:transparent; -webkit-text-stroke:1px rgba(245,246,241,.07); pointer-events:none; user-select:none; white-space:nowrap; }
+.hero .mono-top{ font-size:10px; letter-spacing:.4em; color:var(--green-400); }
+.hero h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(52px,9vw,132px); letter-spacing:-.03em; line-height:.98; margin-top:14px; }
+.hero h1 em{ font-style:normal; color:var(--green-400); }
+.hero p.sub{ margin-top:22px; max-width:520px; color:var(--muted); font-size:15px; line-height:1.8; }
+.hero .scroll-hint{ position:absolute; bottom:34px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px; font-family:var(--font-mono); font-size:9px; letter-spacing:.4em; color:var(--muted); }
+.hero .line{ width:1px; height:46px; background:linear-gradient(180deg,var(--green-400),transparent); animation:drop 1.8s var(--ease) infinite; transform-origin:top; }
+@keyframes drop{ 0%{ transform:scaleY(0);} 45%{ transform:scaleY(1);} 100%{ transform:scaleY(1); opacity:0;} }
+section{ padding:clamp(70px,11vh,120px) var(--space); position:relative; }
+.sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom:clamp(30px,5vh,56px); }
+.sec-head h2{ font-family:var(--font-display); font-weight:800; font-size:clamp(30px,4.6vw,64px); letter-spacing:-.02em; }
+.sec-head .num{ font-family:var(--font-mono); font-size:10px; letter-spacing:.34em; color:var(--green-400); }
+.sec-head .sub{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); text-align:right; max-width:300px; line-height:1.8; }
+.fx-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
+.cell{ border:1px solid var(--line); border-radius:18px; background:var(--bg-2); padding:18px 18px 16px; display:flex; flex-direction:column; transition:border-color .35s, transform .4s var(--ease), box-shadow .4s var(--ease); }
+.cell:hover{ border-color:rgba(47,201,188,.45); transform:translateY(-3px); box-shadow:0 22px 50px rgba(0,0,0,.45); }
+.cell__label{ font-family:var(--font-mono); font-size:9px; letter-spacing:.26em; color:var(--green-200); }
+.cell__demo{ flex:1; min-height:110px; display:flex; align-items:center; justify-content:center; }
+.cell__note{ font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; color:var(--muted); border-top:1px solid var(--line); padding-top:12px; margin-top:8px; }
+.t{ font-family:var(--font-display); font-weight:800; font-size:clamp(30px,3.2vw,46px); letter-spacing:-.01em; display:inline-block; }
+.u-lr{ position:relative; }
+.u-lr::after{ content:''; position:absolute; left:0; bottom:-6px; width:100%; height:2px; background:var(--green-400); transform:scaleX(0); transform-origin:right; transition:transform .45s var(--ease); }
+.u-lr:hover::after{ transform:scaleX(1); transform-origin:left; }
+.u-c{ position:relative; }
+.u-c::after{ content:''; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--green-400); transform:scaleX(0); transition:transform .45s var(--ease); }
+.u-c:hover::after{ transform:scaleX(1); }
+.fill{ background:linear-gradient(90deg, var(--green-400) 50%, var(--paper) 50%); background-size:200% 100%; background-position:100% 0; -webkit-background-clip:text; background-clip:text; color:transparent; transition:background-position .55s var(--ease); }
+.fill:hover{ background-position:0 0; }
+.swap{ position:relative; display:inline-block; overflow:hidden; line-height:1.1; }
+.swap span{ display:block; transition:transform .5s var(--ease); }
+.swap span:last-child{ position:absolute; left:0; top:0; transform:translateY(110%); color:var(--green-400); }
+.swap:hover span:first-child{ transform:translateY(-110%); }
+.swap:hover span:last-child{ transform:translateY(0); }
+.wave{ display:inline-block; }
+.wave .ch{ display:inline-block; transition:transform .4s var(--ease), color .4s var(--ease); will-change:transform; }
+.wave:hover .ch{ transform:translateY(-10px) rotate(-4deg); color:var(--green-400); }
+.mag{ display:inline-block; transition:transform .35s var(--ease); will-change:transform; }
+.glitch{ position:relative; display:inline-block; }
+.glitch::before,.glitch::after{ content:attr(data-text); position:absolute; left:0; top:0; width:100%; opacity:0; pointer-events:none; }
+.glitch:hover::before{ opacity:.9; color:var(--green-400); transform:translate(-3px,2px); clip-path:inset(12% 0 52% 0); animation:gl1 .35s steps(2,end) infinite; }
+.glitch:hover::after{ opacity:.9; color:var(--paper); transform:translate(3px,-2px); clip-path:inset(60% 0 8% 0); animation:gl2 .35s steps(2,end) infinite reverse; }
+@keyframes gl1{ 0%{ transform:translate(-3px,2px);} 50%{ transform:translate(2px,-2px);} 100%{ transform:translate(-2px,1px);} }
+@keyframes gl2{ 0%{ transform:translate(3px,-2px);} 50%{ transform:translate(-2px,2px);} 100%{ transform:translate(2px,-1px);} }
+.marker{ position:relative; z-index:0; display:inline-block; }
+.marker::before{ content:''; position:absolute; z-index:-1; left:-.04em; right:-.04em; top:.62em; bottom:.08em; background:linear-gradient(100deg, var(--green), var(--green-400)); transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); border-radius:.08em; }
+.marker:hover{ color:#050706; transition:color .3s .1s; }
+.marker:hover::before{ transform:scaleX(1); }
+.track{ display:inline-block; transition:letter-spacing .45s var(--ease); }
+.track:hover{ letter-spacing:.12em; }
+.shine{ position:relative; display:inline-block; overflow:hidden; }
+.shine::after{ content:''; position:absolute; top:-10%; bottom:-10%; width:42%; left:-60%; background:linear-gradient(105deg, transparent, rgba(255,255,255,.35) 45%, rgba(47,201,188,.5) 50%, rgba(255,255,255,.35) 55%, transparent); transform:skewX(-20deg); transition:left .6s var(--ease); }
+.shine:hover::after{ left:130%; }
+.roll{ display:inline-block; transition:transform .45s var(--ease), color .3s; }
+.roll:hover{ transform:skewX(-6deg) rotate(-2deg) scale(1.04); color:var(--green-400); }
+.blur{ display:inline-block; filter:blur(6px); opacity:.45; transition:filter .5s var(--ease), opacity .5s var(--ease), letter-spacing .5s var(--ease); letter-spacing:.02em; }
+.blur:hover{ filter:blur(0); opacity:1; letter-spacing:0; }
+.card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+.ce{ min-height:230px; border:1px solid var(--line); border-radius:20px; background:var(--bg-2); padding:22px; display:flex; flex-direction:column; position:relative; overflow:hidden; transition:border-color .35s; }
+.ce:hover{ border-color:rgba(47,201,188,.45); }
+.ce__tag{ font-family:var(--font-mono); font-size:9px; letter-spacing:.26em; color:var(--green-200); }
+.ce__title{ font-family:var(--font-display); font-weight:800; font-size:24px; letter-spacing:-.01em; margin-top:8px; }
+.ce__desc{ font-family:var(--font-mono); font-size:9px; letter-spacing:.12em; color:var(--muted); margin-top:auto; padding-top:14px; }
+.tilt{ transform-style:preserve-3d; }
+.tilt::after{ content:''; position:absolute; inset:0; border-radius:inherit; opacity:0; transition:opacity .3s; pointer-events:none; background:radial-gradient(360px circle at var(--gx,50%) var(--gy,50%), rgba(47,201,188,.22), transparent 55%); }
+.tilt:hover::after{ opacity:1; }
+.tilt .ce__title{ transform:translateZ(30px); }
+.spot::after{ content:''; position:absolute; inset:0; border-radius:inherit; opacity:0; transition:opacity .35s; pointer-events:none; background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(47,201,188,.28), transparent 62%); }
+.spot:hover::after{ opacity:1; }
+.bd::before,.bd::after,.bd .bdl,.bd .bdr{ content:''; position:absolute; background:var(--green-400); opacity:.9; }
+.bd::before{ top:0; left:0; right:0; height:2px; transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); }
+.bd::after{ bottom:0; left:0; right:0; height:2px; transform:scaleX(0); transform-origin:right; transition:transform .4s var(--ease) .1s; }
+.bd .bdl{ left:0; top:0; bottom:0; width:2px; transform:scaleY(0); transform-origin:top; transition:transform .4s var(--ease) .05s; }
+.bd .bdr{ right:0; top:0; bottom:0; width:2px; transform:scaleY(0); transform-origin:bottom; transition:transform .4s var(--ease) .15s; }
+.bd:hover::before,.bd:hover::after{ transform:scaleX(1); }
+.bd:hover .bdl,.bd:hover .bdr{ transform:scaleY(1); }
+.cb .c{ position:absolute; width:16px; height:16px; border:2px solid var(--green-400); opacity:0; transform:scale(.5); transition:all .3s var(--ease); }
+.cb .c1{ top:12px; left:12px; border-right:none; border-bottom:none; }
+.cb .c2{ top:12px; right:12px; border-left:none; border-bottom:none; }
+.cb .c3{ bottom:12px; left:12px; border-right:none; border-top:none; }
+.cb .c4{ bottom:12px; right:12px; border-left:none; border-top:none; }
+.cb:hover .c{ opacity:1; transform:scale(1); }
+.thumb{ overflow:hidden; }
+.thumb .art{ position:absolute; inset:0; }
+.thumb .art svg{ width:100%; height:100%; object-fit:cover; filter:grayscale(1); transition:filter .6s var(--ease), transform .8s var(--ease); }
+.thumb:hover .art svg{ filter:grayscale(0); transform:scale(1.08); }
+.thumb .ov{ position:absolute; inset:auto 0 0 0; padding:18px; background:linear-gradient(180deg,transparent,rgba(5,7,6,.88)); transform:translateY(101%); transition:transform .5s var(--ease); }
+.thumb:hover .ov{ transform:translateY(0); }
+.thumb .ov b{ font-family:var(--font-display); font-weight:800; font-size:22px; }
+.thumb .ov span{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; color:var(--green-200); margin-top:6px; }
+.flip-wrap{ perspective:900px; }
+.flip-in{ position:absolute; inset:0; transform-style:preserve-3d; transition:transform .7s var(--ease); }
+.flip-wrap:hover .flip-in{ transform:rotateY(180deg); }
+.flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:20px; border:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; padding:24px; background:var(--bg-2); }
+.flip-back{ transform:rotateY(180deg); background:linear-gradient(145deg,var(--green),var(--green-700)); border-color:transparent; color:#050706; }
+.flip-back b{ font-family:var(--font-display); font-weight:800; font-size:26px; }
+.flip-back span{ font-family:var(--font-mono); font-size:10px; letter-spacing:.18em; margin-top:8px; }
+.gal-list{ display:flex; flex-direction:column; border-top:1px solid var(--line); }
+.gal-item{ display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:18px; padding:clamp(16px,2.6vw,26px) 8px; border-bottom:1px solid var(--line); transition:padding-left .4s var(--ease), background .3s; }
+.gal-item:hover{ padding-left:24px; background:rgba(47,201,188,.04); }
+.gal-item .idx{ font-family:var(--font-mono); font-size:10px; letter-spacing:.2em; color:var(--muted); }
+.gal-item h3{ font-family:var(--font-display); font-weight:800; font-size:clamp(24px,3.4vw,46px); letter-spacing:-.02em; }
+.gal-item .tag{ font-family:var(--font-mono); font-size:9px; letter-spacing:.24em; color:var(--green-200); }
+.gal-item .go{ font-family:var(--font-mono); font-size:10px; letter-spacing:.3em; color:var(--green-400); opacity:0; transform:translateX(-10px); transition:all .4s var(--ease); }
+.gal-item:hover .go{ opacity:1; transform:translateX(0); }
+#preview{ position:fixed; top:0; left:0; z-index:800; width:260px; height:190px; pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.85) rotate(-3deg); transition:opacity .3s var(--ease); will-change:transform; }
+#preview.on{ opacity:1; }
+#preview .pv-in{ width:100%; height:100%; border-radius:14px; overflow:hidden; border:1px solid var(--green-700); box-shadow:0 30px 70px rgba(0,0,0,.6); background:var(--bg-2); }
+#preview svg{ width:100%; height:100%; object-fit:cover; }
+#preview .pv-cap{ position:absolute; left:10px; bottom:10px; font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; color:var(--paper); background:rgba(5,7,6,.6); padding:5px 10px; border-radius:99px; backdrop-filter:blur(4px); }
+@media (pointer:coarse){ #preview{ display:none; } }
+.marquee-row{ overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:18px 0; }
+.marquee-track{ display:flex; width:max-content; min-width:max-content; animation:mloop 22s linear infinite; }
+@keyframes mloop{ to{ transform:translateX(-50%); } }
+.mq-group{ display:flex; }
+.mq-item{ display:flex; align-items:center; gap:14px; padding-right:34px; font-family:var(--font-display); font-weight:800; font-size:clamp(28px,4vw,52px); letter-spacing:-.02em; white-space:nowrap; color:var(--muted); }
+.mq-item .dot{ width:10px; height:10px; border-radius:50%; background:var(--green-400); flex-shrink:0; }
+.drag-row{ display:flex; gap:16px; overflow-x:auto; padding:6px 2px 20px; cursor:grab; scrollbar-width:thin; scrollbar-color:var(--green-700) transparent; }
+.drag-row:active{ cursor:grabbing; }
+.drag-row::-webkit-scrollbar{ height:5px; }
+.drag-row::-webkit-scrollbar-thumb{ background:var(--green-700); border-radius:99px; }
+.drag-item{ min-width:230px; height:150px; border-radius:16px; border:1px solid var(--line); overflow:hidden; position:relative; flex-shrink:0; user-select:none; }
+.drag-item svg{ width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease); }
+.drag-item:hover svg{ transform:scale(1.06); }
+.drag-item span{ position:absolute; left:14px; bottom:12px; font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; color:var(--paper); }
+footer{ padding:40px var(--space) 50px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:var(--font-mono); font-size:10px; letter-spacing:.2em; color:var(--muted); }
+footer a{ color:var(--green-200); }
+footer a:hover{ color:var(--green-400); }
+@media (max-width:720px){ .head-nav .hide-m{ display:none; } .sec-head{ flex-direction:column; align-items:flex-start; } .sec-head .sub{ text-align:left; } }
+</style>
+</head><body>
+
+<div id="cur-dot"></div><div id="cur-ring"></div>
+
+<header class="site-head">
+  <a class="logo" href="hover-effects.html">Frey<i>✦</i> Lab</a>
+  <nav class="head-nav">
+    <a href="#text">Text</a>
+    <a href="#cards">Cards</a>
+    <a href="#gallery" class="hide-m">Gallery</a>
+    <a class="head-cta" href="index.html">返回主站 →</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">HOVER</div>
+    <p class="mono-top">FREY ✦ INTERACTION LAB / 交互动效实验室</p>
+    <h1>Hover<br>to <em>discover</em>.</h1>
+    <p class="sub">把鼠标移到下面的文字、卡片和画廊上看看效果。全部是纯 CSS + 少量 vanilla JS，配色沿用马尔斯绿 × 黑 × 白，可以直接搬进个人站。</p>
+    <div class="scroll-hint"><span>scroll</span><span class="line"></span></div>
+  </section>
+
+  <section id="text">
+    <div class="sec-head">
+      <div>
+        <span class="num">01 — TEXT HOVER</span>
+        <h2>文字悬停动效<span style="color:var(--green-400)">.</span></h2>
+      </div>
+      <p class="sub">可点击文字 / 导航 / 菜单链接的 hover 效果</p>
+    </div>
+    <div class="fx-grid">
+
+      <div class="cell">
+        <span class="cell__label">01 / underline · left→right</span>
+        <div class="cell__demo"><a class="t u-lr" href="#" onclick="return false">下划线左入</a></div>
+        <p class="cell__note">下划线从左侧滑入 · 适合导航链接</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">02 / underline · center</span>
+        <div class="cell__demo"><a class="t u-c" href="#" onclick="return false">向两端展开</a></div>
+        <p class="cell__note">下划线从中间向两侧展开</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">03 / fill wipe</span>
+        <div class="cell__demo"><a class="t fill" href="#" onclick="return false">颜色填充</a></div>
+        <p class="cell__note">文字被马尔斯绿从左到右刷过</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">04 / swap reveal</span>
+        <div class="cell__demo">
+          <a class="t swap" href="#" onclick="return false"><span>上滑换词</span><span>REVEAL ✦</span></a>
+        </div>
+        <p class="cell__note">悬停时文字上滑，露出下层另一个词</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">05 / wave</span>
+        <div class="cell__demo"><a class="t wave" data-wave href="#" onclick="return false">字母波浪</a></div>
+        <p class="cell__note">每个字母逐个弹起、轻微旋转</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">06 / magnetic</span>
+        <div class="cell__demo"><a class="t mag" data-magnetic href="#" onclick="return false">磁性吸附</a></div>
+        <p class="cell__note">文字被鼠标轻轻吸过去，离开弹回</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">07 / glitch</span>
+        <div class="cell__demo"><a class="t glitch" data-text="故障抖动" href="#" onclick="return false">故障抖动</a></div>
+        <p class="cell__note">绿 / 白双层 clip-path 错位 + 抖动</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">08 / marker</span>
+        <div class="cell__demo"><a class="t marker" href="#" onclick="return false">荧光笔</a></div>
+        <p class="cell__note">绿色高亮从左边划出，文字变黑</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">09 / tracking</span>
+        <div class="cell__demo"><a class="t track" href="#" onclick="return false">字距呼吸</a></div>
+        <p class="cell__note">letter-spacing 缓缓展开</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">10 / shine</span>
+        <div class="cell__demo"><a class="t shine" href="#" onclick="return false">扫光</a></div>
+        <p class="cell__note">一道高光斜着扫过文字</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">11 / skew roll</span>
+        <div class="cell__demo"><a class="t roll" href="#" onclick="return false">倾斜滚动</a></div>
+        <p class="cell__note">文字倾斜 + 旋转 + 轻微放大</p>
+      </div>
+
+      <div class="cell">
+        <span class="cell__label">12 / blur focus</span>
+        <div class="cell__demo"><a class="t blur" href="#" onclick="return false">失焦 → 聚焦</a></div>
+        <p class="cell__note">模糊的文字悬停后变清晰（文字出现）</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="cards">
+    <div class="sec-head">
+      <div>
+        <span class="num">02 — CARD HOVER</span>
+        <h2>卡片悬停动效<span style="color:var(--green-400)">.</span></h2>
+      </div>
+      <p class="sub">作品卡 / 项目卡 / 入口卡</p>
+    </div>
+    <div class="card-grid">
+
+      <div class="ce tilt" data-tilt>
+        <span class="ce__tag">3D TILT</span>
+        <b class="ce__title">3D 倾斜卡</b>
+        <p class="ce__desc">鼠标跟随透视旋转 + 边缘绿色高光</p>
+      </div>
+
+      <div class="ce spot" data-spot>
+        <span class="ce__tag">SPOTLIGHT</span>
+        <b class="ce__title">聚光跟随</b>
+        <p class="ce__desc">一束绿光跟着鼠标在卡内游走</p>
+      </div>
+
+      <div class="ce bd">
+        <span class="ce__tag">BORDER DRAW</span>
+        <b class="ce__title">边框描画</b>
+        <p class="ce__desc">四条边按顺序画出来</p>
+        <i class="bdl"></i><i class="bdr"></i>
+      </div>
+
+      <div class="ce cb">
+        <span class="ce__tag">CORNERS</span>
+        <b class="ce__title">四角括号</b>
+        <p class="ce__desc">四个角标像取景框一样弹出</p>
+        <i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>
+      </div>
+
+      <div class="ce thumb">
+        <div class="art">
+          <svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#0A0F0D"/><circle cx="160" cy="96" r="58" fill="none" stroke="#01847F" stroke-width="2"/><circle cx="160" cy="96" r="18" fill="#2FC9BC"/><path d="M60 180 Q110 120 160 150 T260 170" fill="none" stroke="#F5F6F1" stroke-width="2" opacity=".7"/><rect x="70" y="40" width="40" height="40" fill="none" stroke="#9BE8E0" stroke-width="2"/><rect x="210" y="130" width="40" height="40" fill="none" stroke="#9BE8E0" stroke-width="2"/></svg>
+        </div>
+        <div class="ov"><b>标题上滑</b><span>grayscale → color · ENGINEERING</span></div>
+        <span class="ce__tag" style="position:absolute;top:18px;left:18px;z-index:2">IMG REVEAL</span>
+      </div>
+
+      <div class="ce flip-wrap">
+        <div class="flip-in">
+          <div class="flip-face">
+            <span class="ce__tag">FLIP 3D</span>
+            <b class="ce__title">翻转卡</b>
+            <p class="ce__desc">hover 翻到背面</p>
+          </div>
+          <div class="flip-face flip-back">
+            <b>HIDDEN ✦</b>
+            <span>背面信息 · back side</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>  <section id="gallery">
+    <div class="sec-head">
+      <div>
+        <span class="num">03 — GALLERY</span>
+        <h2>画廊 / 列表动效<span style="color:var(--green-400)">.</span></h2>
+      </div>
+      <p class="sub">作品列表 + 鼠标跟随预览 · 无限横幅 · 拖拽滚动</p>
+    </div>
+
+    <div id="preview" aria-hidden="true">
+      <div class="pv-in"><svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><circle cx="160" cy="100" r="62" fill="none" stroke="#01847F" stroke-width="2"/><circle cx="160" cy="100" r="20" fill="#2FC9BC"/><path d="M40 150 Q110 90 160 120 T280 140" fill="none" stroke="#F5F6F1" stroke-width="2" opacity=".7"/></svg></div>
+      <span class="pv-cap">preview / 01</span>
+    </div>
+
+    <div class="gal-list">
+      <a class="gal-item" href="#" data-preview="01" onclick="return false">
+        <span class="idx">01</span><h3>Labradorite Engine</h3><span class="tag">THREE.JS</span><span class="go">VIEW →</span>
+      </a>
+      <a class="gal-item" href="#" data-preview="02" onclick="return false">
+        <span class="idx">02</span><h3>Polaroid Wall</h3><span class="tag">CANVAS</span><span class="go">VIEW →</span>
+      </a>
+      <a class="gal-item" href="#" data-preview="03" onclick="return false">
+        <span class="idx">03</span><h3>Vinyl Deck</h3><span class="tag">WEB AUDIO</span><span class="go">VIEW →</span>
+      </a>
+      <a class="gal-item" href="#" data-preview="04" onclick="return false">
+        <span class="idx">04</span><h3>Fold Type</h3><span class="tag">GSAP</span><span class="go">VIEW →</span>
+      </a>
+      <a class="gal-item" href="#" data-preview="05" onclick="return false">
+        <span class="idx">05</span><h3>Ask Box</h3><span class="tag">SVG</span><span class="go">VIEW →</span>
+      </a>
+    </div>
+
+    <div class="marquee-row" style="margin-top:56px">
+      <div class="marquee-track">
+        <div class="mq-group">
+          <span class="mq-item">FREY<i class="dot"></i></span><span class="mq-item">WORK<i class="dot"></i></span><span class="mq-item">HOBBY<i class="dot"></i></span><span class="mq-item">ASK<i class="dot"></i></span><span class="mq-item">CREATER<i class="dot"></i></span>
+        </div>
+        <div class="mq-group">
+          <span class="mq-item">FREY<i class="dot"></i></span><span class="mq-item">WORK<i class="dot"></i></span><span class="mq-item">HOBBY<i class="dot"></i></span><span class="mq-item">ASK<i class="dot"></i></span><span class="mq-item">CREATER<i class="dot"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="drag-row" data-drag style="margin-top:40px">
+      <div class="drag-item"><svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice"><rect width="240" height="150" fill="#0A0F0D"/><circle cx="120" cy="75" r="42" fill="none" stroke="#01847F" stroke-width="2"/><circle cx="120" cy="75" r="12" fill="#2FC9BC"/></svg><span>drag 01</span></div>
+      <div class="drag-item"><svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice"><rect width="240" height="150" fill="#0A0F0D"/><path d="M0 120 L80 40 L160 100 L240 30" fill="none" stroke="#9BE8E0" stroke-width="3"/><circle cx="160" cy="100" r="8" fill="#F5F6F1"/></svg><span>drag 02</span></div>
+      <div class="drag-item"><svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice"><rect width="240" height="150" fill="#0A0F0D"/><rect x="30" y="30" width="60" height="60" fill="none" stroke="#01847F" stroke-width="3"/><rect x="150" y="60" width="60" height="60" fill="none" stroke="#2FC9BC" stroke-width="3"/><circle cx="180" cy="30" r="14" fill="none" stroke="#F5F6F1" stroke-width="2"/></svg><span>drag 03</span></div>
+      <div class="drag-item"><svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice"><rect width="240" height="150" fill="#0A0F0D"/><path d="M30 120 Q70 40 120 90 T210 60" fill="none" stroke="#2FC9BC" stroke-width="3"/><path d="M30 120 Q70 40 120 90 T210 60" fill="none" stroke="#F5F6F1" stroke-width="1" stroke-dasharray="3 8"/></svg><span>drag 04</span></div>
+      <div class="drag-item"><svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice"><rect width="240" height="150" fill="#0A0F0D"/><circle cx="60" cy="75" r="30" fill="#01847F"/><circle cx="180" cy="75" r="30" fill="none" stroke="#2FC9BC" stroke-width="3"/></svg><span>drag 05</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Frey ✦ Hover Lab — 纯 CSS + vanilla JS</span>
+  <span><a href="index.html">← 回主站</a> · <a href="#text">TOP ↑</a></span>
+</footer><script>
+document.querySelectorAll('[data-wave]').forEach(function(el){
+  var text = el.textContent;
+  el.textContent = '';
+  Array.prototype.forEach.call(text, function(ch, i){
+    var s = document.createElement('span');
+    s.className = 'ch';
+    s.textContent = ch;
+    s.style.transitionDelay = (i*28)+'ms';
+    el.appendChild(s);
+  });
+});
+document.querySelectorAll('[data-magnetic]').forEach(function(el){
+  el.addEventListener('mousemove', function(e){
+    var r = el.getBoundingClientRect();
+    var x = e.clientX - r.left - r.width/2;
+    var y = e.clientY - r.top - r.height/2;
+    el.style.transform = 'translate('+(x*.3)+'px,'+(y*.3)+'px)';
+  });
+  el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+});
+document.querySelectorAll('[data-tilt]').forEach(function(card){
+  card.addEventListener('mousemove', function(e){
+    var r = card.getBoundingClientRect();
+    var px = (e.clientX - r.left)/r.width - .5;
+    var py = (e.clientY - r.top)/r.height - .5;
+    card.style.transform = 'perspective(800px) rotateX('+(-py*12)+'deg) rotateY('+(px*12)+'deg) translateY(-6px)';
+    card.style.setProperty('--gx', ((px+.5)*100)+'%');
+    card.style.setProperty('--gy', ((py+.5)*100)+'%');
+  });
+  card.addEventListener('mouseleave', function(){ card.style.transform = ''; });
+});
+document.querySelectorAll('[data-spot]').forEach(function(card){
+  card.addEventListener('mousemove', function(e){
+    var r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left)+'px');
+    card.style.setProperty('--my', (e.clientY - r.top)+'px');
+  });
+});
+(function(){
+  var preview = document.getElementById('preview');
+  if(!preview || !window.matchMedia('(pointer:fine)').matches) return;
+  var imgs = {
+    '01':'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><circle cx="160" cy="100" r="62" fill="none" stroke="#01847F" stroke-width="2"/><circle cx="160" cy="100" r="20" fill="#2FC9BC"/><path d="M40 150 Q110 90 160 120 T280 140" fill="none" stroke="#F5F6F1" stroke-width="2" opacity=".7"/></svg>',
+    '02':'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><rect x="60" y="30" width="70" height="86" fill="none" stroke="#F5F6F1" stroke-width="2" transform="rotate(-4 95 73)"/><rect x="150" y="50" width="70" height="86" fill="none" stroke="#2FC9BC" stroke-width="2" transform="rotate(5 185 93)"/><rect x="105" y="40" width="70" height="86" fill="#01847F" transform="rotate(1 140 83)"/></svg>',
+    '03':'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><circle cx="160" cy="100" r="70" fill="#0C0F0E" stroke="#2FC9BC" stroke-width="2"/><circle cx="160" cy="100" r="40" fill="none" stroke="#9BE8E0" stroke-width="1" stroke-dasharray="2 6"/><circle cx="160" cy="100" r="8" fill="#F5F6F1"/><path d="M250 40 L300 20" stroke="#F5F6F1" stroke-width="3"/></svg>',
+    '04':'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><path d="M40 120 L160 60 L280 120" fill="none" stroke="#F5F6F1" stroke-width="2"/><path d="M60 140 L160 85 L260 140" fill="none" stroke="#01847F" stroke-width="2"/><path d="M80 160 L160 110 L240 160" fill="none" stroke="#2FC9BC" stroke-width="2"/></svg>',
+    '05':'<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><rect width="320" height="200" fill="#0A0F0D"/><rect x="90" y="60" width="140" height="110" rx="12" fill="#01847F"/><rect x="105" y="74" width="110" height="12" rx="6" fill="#050706"/><path d="M128 122 L160 146 L192 122" fill="none" stroke="#F5F6F1" stroke-width="3"/></svg>'
+  };
+  var cap = preview.querySelector('.pv-cap');
+  var inner = preview.querySelector('.pv-in');
+  var items = document.querySelectorAll('.gal-item');
+  var tx=0, ty=0, cx=0, cy=0, raf=null, active=false;
+  function loop(){
+    cx += (tx-cx)*.18; cy += (ty-cy)*.18;
+    preview.style.transform = 'translate('+cx+'px,'+cy+'px) translate(-50%,-50%) scale(.9) rotate(-3deg)';
+    if(active){ raf = requestAnimationFrame(loop); } else { raf = null; }
+  }
+  items.forEach(function(it){
+    it.addEventListener('mouseenter', function(){
+      var k = it.getAttribute('data-preview');
+      inner.innerHTML = imgs[k] || imgs['01'];
+      cap.textContent = 'preview / ' + k;
+      preview.classList.add('on');
+      active = true;
+      if(!raf) raf = requestAnimationFrame(loop);
+    });
+    it.addEventListener('mousemove', function(e){ tx = e.clientX; ty = e.clientY; });
+    it.addEventListener('mouseleave', function(){ preview.classList.remove('on'); active = false; });
+  });
+})();
+document.querySelectorAll('[data-drag]').forEach(function(row){
+  var down=false, startX=0, startLeft=0;
+  row.addEventListener('mousedown', function(e){ down=true; startX=e.clientX; startLeft=row.scrollLeft; });
+  window.addEventListener('mousemove', function(e){
+    if(!down) return;
+    row.scrollLeft = startLeft - (e.clientX - startX);
+  });
+  window.addEventListener('mouseup', function(){ down=false; });
+});
+(function(){
+  if(!window.matchMedia('(pointer:fine)').matches) return;
+  document.body.classList.add('has-cursor');
+  var dot = document.getElementById('cur-dot');
+  var ring = document.getElementById('cur-ring');
+  var mx=0,my=0,rx=0,ry=0,raf=null;
+  document.addEventListener('mousemove', function(e){
+    mx=e.clientX; my=e.clientY;
+    dot.style.transform='translate('+mx+'px,'+my+'px) translate(-50%,-50%)';
+    if(!raf) raf=requestAnimationFrame(function(){
+      rx+=(mx-rx)*.16; ry+=(my-ry)*.16;
+      ring.style.transform='translate('+rx+'px,'+ry+'px) translate(-50%,-50%)';
+      raf=null;
+    });
+  });
+  document.querySelectorAll('a,button,.gal-item,.drag-row').forEach(function(el){
+    el.addEventListener('mouseenter', function(){ document.body.classList.add('cur-on'); });
+    el.addEventListener('mouseleave', function(){ document.body.classList.remove('cur-on'); });
+  });
+})();
+/* marquee: damped slowdown on hover (no glow, no instant pause) */
+document.querySelectorAll('.marquee-row').forEach(function(row){
+  var track = row.querySelector('.marquee-track');
+  if(!track || track.dataset.mq === '1') return;
+  track.dataset.mq = '1';
+  track.style.animation = 'none';
+  var base = 40, target = 40, speed = 40, x = 0, last = performance.now();
+  function half(){ return track.scrollWidth / 2; }
+  function step(now){
+    var dt = Math.min((now - last)/1000, .05); last = now;
+    speed += (target - speed) * Math.min(1, dt * 3);
+    x -= speed * dt;
+    var h = half();
+    if(h > 0 && x <= -h) x += h;
+    track.style.transform = 'translateX(' + x.toFixed(2) + 'px)';
+    requestAnimationFrame(step);
+  }
+  row.addEventListener('mouseenter', function(){ target = base * 0.15; });
+  row.addEventListener('mouseleave', function(){ target = base; });
+  requestAnimationFrame(step);
+});
+</script>
+</body>
+</html>

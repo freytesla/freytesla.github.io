@@ -1,0 +1,73 @@
+/* 加载动画：马尔斯绿底 + 黑色 FREY
+   进入页面：下落（瀑布，至少两轮，没加载好继续落）→ 飞向四角 → 淡出
+   页面转换：四角字母飞回中心 → 跳转 → 新页从中心飞向四角（不下落） */
+@font-face{
+  font-family:'FK Roman Standard';
+  src:url('../assets/fonts/FKRomanStandard-Light.woff2') format('woff2');
+  font-weight:300;
+  font-display:swap;
+}
+#loader{
+  position:fixed; inset:0; z-index:9999;
+  background:#008C8C;
+  display:flex; align-items:center; justify-content:center;
+  opacity:1; visibility:visible;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#loader.done{ opacity:0; visibility:hidden; }
+
+.corner-fly{ display:flex; gap:.18em; }
+/* 底部加载进度条 */
+.progress{
+  position:absolute; left:0; right:0; bottom:0; height:2px;
+  background:rgba(0,0,0,.14);
+  pointer-events:none;
+}
+.progress span{
+  display:block; height:100%; width:0%;
+  background:#000;
+}
+/* 右下角百分比 */
+.progress-pct{
+  position:absolute; right:18px; bottom:10px;
+  font-family:'FK Roman Standard', Georgia, serif;
+  font-weight:300;
+  font-size:14px;
+  letter-spacing:.06em;
+  color:#000;
+  pointer-events:none;
+  user-select:none;
+}
+/* 页面转换退出时隐藏进度条（只在新页显示一次） */
+#loader.hide-progress .progress,
+#loader.hide-progress .progress-pct{ opacity:0; transition:opacity .3s ease; }
+.corner-fly span{
+  font-family:'FK Roman Standard', Georgia, serif;
+  font-weight:300;
+  font-size:clamp(60px, 12vw, 130px);
+  line-height:1;
+  color:#000;
+  display:inline-block;
+  opacity:1;
+  will-change:transform;
+}
+/* 下落模式：瀑布 */
+#loader.playing .corner-fly span{
+  animation-name:waterfall;
+  animation-duration:1.25s;
+  animation-iteration-count:1;
+  animation-fill-mode:both;
+}
+/* 最后一轮：落到同一行后停在中心，不淡出，直接飞四角 */
+#loader.playing.landing .corner-fly span{
+  animation-name:waterfall-land;
+}
+@keyframes waterfall-land{
+  0%{ opacity:0; transform:translateY(-50%); }
+  40%,100%{ opacity:1; transform:translateY(0); }
+}
+@keyframes waterfall{
+  0%{ opacity:0; transform:translateY(-50%); }
+  40%,60%{ opacity:1; transform:translateY(0); }
+  100%{ opacity:0; transform:translateY(50%); }
+}

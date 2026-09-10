@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask — Frey</title>
+<meta name="description" content="Frey · Ask — 提问箱">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/syne-800.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-grotesk-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-mono-400.woff2">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/ask.css">
+</head>
+<body data-theme="dark">
+
+    <div id="loader" aria-hidden="true">
+    <div class="loader__scene">
+      <div class="loader__rope"></div>
+      <div class="loader__pendant"></div>
+      <div class="loader__word">
+        <span>A</span>
+        <span>S</span>
+        <span>K</span>
+        <span class="loader__gem">✦</span>
+      </div>
+    </div>
+    <div class="loader__meta">
+      <span class="loader__label">question box</span>
+      <span class="loader__bar"><i></i></span>
+      <span class="loader__pct">000</span>
+    </div>
+  </div>
+<div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <header class="site-head">
+    <a class="logo" href="index.html" aria-label="Frey home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="16" fill="currentColor" opacity="0.06"/><path d="M20 14h26v8H29v9h14v8H29v11h-9z" fill="currentColor"/><circle cx="46" cy="46" r="5" fill="#01847F"/></svg>
+      <b>Frey<i>✦</i></b>
+    </a>
+    <nav class="head-nav" aria-label="primary">
+      <a class="head-link" href="index.html">Index</a>
+      <a class="head-link" href="work.html">Work</a>
+      <a class="head-link" href="hobby.html">Hobby</a>
+      <a class="head-link is-active" href="ask.html">Ask</a>
+      <a class="head-cta" href="index.html#choose">选择页 ↑</a>
+    </nav>
+    <button class="head-burger" aria-label="menu"><i></i><i></i><i></i></button>
+  </header>
+  <div class="head-mobile">
+    <a href="index.html">Index<span>✦</span></a>
+    <a href="work.html">Work<span>✦</span></a>
+    <a href="hobby.html">Hobby<span>✦</span></a>
+    <a href="ask.html">Ask<span>✦</span></a>
+  </div>
+
+  <main class="ask-main">
+    <!-- left: question + button -->
+    <section class="ask-left" data-reveal="left">
+      <p class="mono green">04 — ASK / 提问箱</p>
+      <h1 class="ask-title display">想对我说点什么<span class="green">?</span></h1>
+      <p class="ask-sub">问题、建议、悄悄话，或者只是打声招呼。<br>全部匿名 · 会认真读。</p>
+
+      <div class="ask-chips" aria-label="示例问题">
+        <span class="chip mono">「你最近在做什么？」</span>
+        <span class="chip mono">「推荐一首歌吧」</span>
+        <span class="chip mono">「最喜欢的一句话？」</span>
+      </div>
+
+      <!-- 点击跳转到你的提问箱：地址在 assets/js/ask.js 里改 ASK_URL -->
+      <a id="ask-btn" class="btn btn--solid ask-btn" href="#" target="_blank" rel="noopener">
+        <span>打开提问箱</span><span class="arr">→</span>
+      </a>
+      <p class="ask-note mono">提问箱地址占位，可在 ask.js 中替换</p>
+
+      <div class="ask-contacts">
+        <p class="mono dim">或直接找我：</p>
+        <div class="ask-contact-links mono">
+          <a href="mailto:hello@frey.dev">email ✉</a>
+          <a href="https://github.com/">github</a>
+          <a href="https://space.bilibili.com/">bilibili</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- right: question box illustration -->
+    <section class="ask-right" data-reveal="right">
+      <div class="ask-scene">
+        <div class="ask-glow"></div>
+        <svg class="ask-box" viewBox="0 0 320 360" role="img" aria-label="提问箱插图">
+          <!-- floating q marks -->
+          <g class="ask-q ask-q1" fill="#2FC9BC" font-family="var(--font-mono), 'Space Mono', monospace" font-weight="700">
+            <text x="30" y="70" font-size="34">?</text>
+            <text x="250" y="40" font-size="24" fill="#9BE8E0">?</text>
+            <text x="286" y="150" font-size="44">?</text>
+            <text x="14" y="220" font-size="20" fill="#D7F4F0">?</text>
+            <text x="240" y="320" font-size="28" fill="#9BE8E0">?</text>
+          </g>
+          <!-- envelope flying in — Phosphor envelope-thin (MIT, https://phosphoricons.com), white edge on dark -->
+          <g class="ask-env">
+            <g transform="translate(48 12) scale(0.42)">
+              <path d="M224,52H32a4,4,0,0,0-4,4V192a12,12,0,0,0,12,12H216a12,12,0,0,0,12-12V56A4,4,0,0,0,224,52Zm-96,86.57L42.28,60H213.72ZM104.63,128,36,190.91V65.09Zm5.92,5.43L125.3,147a4,4,0,0,0,5.4,0l14.75-13.52L213.72,196H42.28ZM151.37,128,220,65.09V190.91Z" fill="#F5F6F1"/>
+            </g>
+          </g>
+          <!-- box — solid marrs green, no gradient, light-green stroke for dark bg -->
+          <rect x="72" y="130" width="176" height="150" rx="14" fill="#01847F" stroke="#2FC9BC" stroke-width="2.5"/>
+          <rect x="88" y="146" width="144" height="16" rx="8" fill="#050706" stroke="#9BE8E0" stroke-width="1.5"/>
+          <path d="M96 168 h128 v8 l-14 12 h-100 l-14 -12 z" fill="#015A56"/>
+          <text x="160" y="236" text-anchor="middle" font-family="var(--font-display),'Syne',sans-serif" font-size="20" font-weight="800" fill="#F5F6F1">FREY</text>
+          <text x="160" y="256" text-anchor="middle" font-family="var(--font-body),'Space Grotesk',sans-serif" font-size="11" font-weight="500" letter-spacing="3" fill="#D7F4F0">ASK ✦ BOX</text>
+          <g fill="#014B47" stroke="#9BE8E0" stroke-width="1.5">
+            <circle cx="160" cy="196" r="5"/><circle cx="178" cy="198" r="5"/><circle cx="142" cy="198" r="5"/>
+          </g>
+          <!-- legs -->
+          <rect x="96" y="280" width="10" height="34" fill="#015A56"/>
+          <rect x="214" y="280" width="10" height="34" fill="#015A56"/>
+          <!-- incoming letter into slot — Phosphor envelope-thin, black edge -->
+          <g class="ask-letter">
+            <g transform="translate(160 138) rotate(-8) scale(0.38) translate(-128 -128)">
+              <rect x="28" y="52" width="200" height="152" rx="12" fill="#F5F6F1"/>
+              <path d="M224,52H32a4,4,0,0,0-4,4V192a12,12,0,0,0,12,12H216a12,12,0,0,0,12-12V56A4,4,0,0,0,224,52Zm-96,86.57L42.28,60H213.72ZM104.63,128,36,190.91V65.09Zm5.92,5.43L125.3,147a4,4,0,0,0,5.4,0l14.75-13.52L213.72,196H42.28ZM151.37,128,220,65.09V190.91Z" fill="#0A0D0C"/>
+            </g>
+          </g>
+        </svg>
+        <div class="ask-caption mono"><span>the question box</span><span>匿名 · anonymous</span></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="page-nav">
+    <span class="muted">Ask / 提问箱</span>
+    <a href="index.html#choose">← 回到选择页</a>
+    <a href="index.html">去首页尾页 · 联系方式 →</a>
+  </nav>
+
+<script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/ui.js"></script>
+<script src="assets/js/ask.js"></script>
+</body>
+</html>
+
+

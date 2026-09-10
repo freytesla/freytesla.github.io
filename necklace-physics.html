@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frey — Labradorite Necklace · Physics Lab</title>
+<meta name="description" content="拉长石项链 · Verlet 重力物理链 + 拖拽交互演示（可接入 Blender 导出的 GLB）">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@300;400;500&family=Space+Mono&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#01847F; --green-400:#2FC9BC; --green-200:#9BE8E0; --green-100:#D7F4F0;
+    --bg:#050706; --paper:#F5F6F1; --muted:rgba(245,246,241,.55); --line:rgba(245,246,241,.14);
+    --font-display:'Syne','Noto Sans SC',sans-serif;
+    --font-mono:'Space Mono','Noto Sans SC',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(1,132,127,.16), transparent 60%),
+      radial-gradient(ellipse 90% 80% at 50% 110%, rgba(1,132,127,.07), transparent 60%),
+      var(--bg);
+    color:var(--paper);
+    font-family:var(--font-display);
+    -webkit-font-smoothing:antialiased;
+  }
+  #stage{position:fixed;inset:0}
+  #stage canvas{display:block;width:100%;height:100%;cursor:grab}
+  #stage.is-grabbed canvas{cursor:grabbing}
+
+  /* ---------- HUD ---------- */
+  .hud{position:fixed;z-index:5;pointer-events:none;user-select:none}
+  .hud--tl{top:26px;left:30px}
+  .hud--tr{top:26px;right:30px;pointer-events:auto}
+  .hud--bl{bottom:26px;left:30px}
+  .hud--br{bottom:26px;right:30px;text-align:right}
+  .brand{display:flex;align-items:baseline;gap:12px}
+  .brand b{font-size:22px;font-weight:800;letter-spacing:.02em}
+  .brand b i{color:var(--green-400);font-style:normal}
+  .brand span{font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+  .back{display:inline-block;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.12em;pointer-events:auto}
+  .back:hover{color:var(--green-200)}
+
+  .panel{
+    display:flex;align-items:center;gap:14px;
+    padding:12px 16px;border:1px solid var(--line);border-radius:14px;
+    background:rgba(5,7,6,.55);backdrop-filter:blur(10px);
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;
+  }
+  .panel label{color:var(--muted)}
+  .panel output{color:var(--green-200);min-width:3em;text-align:right}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:150px;height:2px;background:var(--line);border-radius:2px;outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;
+    background:var(--green);border:2px solid var(--paper);cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--paper);cursor:pointer}
+  .btn{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--paper);
+    background:transparent;border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;transition:.25s;
+  }
+  .btn:hover{color:var(--bg);background:var(--green);border-color:var(--green)}
+
+  .hint{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;color:var(--paper)}
+  .hint i{width:7px;height:7px;border-radius:50%;background:var(--green-400);box-shadow:0 0 12px var(--green-400);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .meta{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;color:var(--muted);line-height:2;text-transform:uppercase}
+  .meta b{color:var(--green-200);font-weight:400}
+
+  @media (max-width:720px){
+    .hud--tr{top:auto;bottom:88px;left:30px;right:30px}
+    .panel{justify-content:space-between}
+    input[type=range]{width:auto;flex:1}
+    .hud--bl{bottom:26px;left:30px;right:30px}
+    .hint{font-size:11px}
+  }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js" } }
+</script>
+</head>
+<body>
+<script>
+/* file:// 直接双击会被浏览器安全策略拦截 ES Module → 给出中文提示 */
+if (location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', function () {
+    var b = document.createElement('div');
+    b.style.cssText = 'position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%, rgba(1,132,127,.16), #050706 72%);color:#F5F6F1;font-family:"Space Mono","Noto Sans SC",monospace;text-align:center;padding:24px;';
+    b.innerHTML = '<div style="max-width:600px;line-height:2.1">'
+      + '<div style="font-size:15px;letter-spacing:.12em">3D 演示需要本地服务器，直接双击会被浏览器安全拦截</div>'
+      + '<div style="margin-top:16px;font-size:12px;letter-spacing:.06em;color:#9BE8E0">推荐：双击仓库里的 <b style="color:#F5F6F1">start-demo.bat</b> 一键启动<br>或手动：<span style="color:#F5F6F1">cd D:/Desktop/frey.github.io &amp;&amp; python -m http.server 8123</span><br>然后浏览器打开 <span style="color:#2FC9BC">http://localhost:8123/necklace-physics.html</span></div>'
+      + '</div>';
+    document.body.appendChild(b);
+  });
+}
+</script>
+
+<main id="stage" aria-label="拉长石项链物理演示：按住拖动，松手回弹">
+  <canvas id="stage-canvas"></canvas>
+</main>
+
+<!-- 左上：品牌 -->
+<div class="hud hud--tl">
+  <div class="brand"><b>Frey<i>✦</i></b><span>Labradorite · Physics Lab</span></div>
+  <a class="back" href="index.html">← 返回主站</a>
+</div>
+
+<!-- 右上：控制 -->
+<div class="hud hud--tr">
+  <div class="panel">
+    <label for="gravity">重力 g</label>
+    <input id="gravity" type="range" min="0" max="20" step="0.1" value="9.8">
+    <output id="gravity-val">9.8</output>
+    <button id="reset" class="btn" type="button">重置 ↓</button>
+  </div>
+</div>
+
+<!-- 左下：提示 -->
+<div class="hud hud--bl">
+  <div class="hint"><i></i>按住链子或吊坠拖动 · 松手重力回弹</div>
+</div>
+
+<!-- 右下：状态 -->
+<div class="hud hud--br">
+  <div class="meta" id="hud-status">g 9.8 · pts 64 · seg 0.090m · 待机</div>
+  <div class="meta" id="hud-model">模型：—</div>
+</div>
+
+<script type="module" src="assets/js/necklace-physics.js"></script>
+</body>
+</html>
+
+

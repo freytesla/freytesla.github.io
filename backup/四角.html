@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frey</title>
+  <style>
+    @font-face{
+      font-family:'FK Roman Standard';
+      src:url('assets/fonts/FKRomanStandard-Light.woff2') format('woff2');
+      font-weight:300;
+      font-display:swap;
+    }
+    html, body{ margin:0; padding:0; height:100%; background:#000; }
+    .site-header{ position:fixed; inset:0; }
+    .site-header__content{ position:relative; width:100%; height:100%; }
+    .brand-row{
+      position:absolute; top:12px; left:12px;
+      display:flex; gap:3px;
+    }
+    .h2-alt{
+      position:relative; display:inline-block;
+      overflow:hidden;                 /* 裁切在自己 span 区域里 */
+      font-family:'FK Roman Standard', Georgia, serif;
+      font-weight:300;
+      font-size:48px;
+      line-height:44px;
+      letter-spacing:-2px;
+      color:#F2F2F2;
+      user-select:none;
+      cursor:default;
+    }
+    .h2-alt .in{
+      display:inline-block;
+      transition:transform .3s ease, opacity .3s ease;
+    }
+    /* 左上排：快；角字母：慢 */
+    .brand-row .h2-alt .in{ transition:transform .25s ease, opacity .25s ease; }
+    .corner-tr .in, .corner-bl .in, .corner-br .in{ transition:transform .3s ease, opacity .3s ease; }
+    .corner-tr{ position:absolute; top:12px; right:12px; }
+    .corner-bl{ position:absolute; bottom:12px; left:12px; }
+    .corner-br{ position:absolute; bottom:12px; right:12px; }
+
+    /* 右上角 R 常显，保持左右翻转 */
+    .corner-tr .in{ transform:scaleX(-1); }
+
+    /* 左上排 R/E/Y 默认隐藏，位移 10px（只在自己 span 内淡入） */
+    .brand-row .letter-r .in{ transform:translateX(-100%); opacity:0; }
+    .brand-row .letter-e .in{ transform:translateX(100%); opacity:0; }
+    .brand-row .letter-y .in{ transform:translateY(100%); opacity:0; }
+    /* hover 阻尼：只有左上排延迟 0.2s；角字母不延迟直接淡出；淡出 Y 先走，R/E 延迟 0.06s */
+    #brand:hover .letter-r .in{ transition-delay:.3s; }
+    #brand:hover .letter-e .in{ transition-delay:.35s; }
+    #brand:hover .letter-y .in{ transition-delay:.45s; }
+    #brand:not(:hover) .letter-e .in{ transition-delay:.06s; }
+    #brand:not(:hover) .letter-r .in{ transition-delay:.16s; }
+
+    /* 悬停左上角 FREY 区域 */
+    #brand:hover .letter-r .in,
+    #brand:hover .letter-e .in,
+    #brand:hover .letter-y .in{ transform:none; opacity:1; }
+    #brand:hover ~ .corner-tr .in{ transform:translateX(100%) scaleX(-1); opacity:0; }
+    #brand:hover ~ .corner-bl .in{ transform:translateX(-100%); opacity:0; }
+    #brand:hover ~ .corner-br .in{ transform:translateY(100%); opacity:0; }
+  </style>
+</head>
+<body>
+  <div class="site-header">
+    <div class="site-header__content">
+      <div class="brand-row" id="brand">
+        <span class="h2-alt letter-f default"><span class="in">F</span></span>
+        <span class="h2-alt letter-r default"><span class="in">R</span></span>
+        <span class="h2-alt letter-e default"><span class="in">E</span></span>
+        <span class="h2-alt letter-y default"><span class="in">Y</span></span>
+      </div>
+      <span class="h2-alt corner-tr"><span class="in">R</span></span>
+      <span class="h2-alt corner-bl"><span class="in">E</span></span>
+      <span class="h2-alt corner-br"><span class="in">Y</span></span>
+    </div>
+  </div>
+</body>
+</html>

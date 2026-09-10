@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Signal Lost · Frey</title>
+<meta name="description" content="404 · 这个页面不存在 · lost in the void">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/syne-800.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-grotesk-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-mono-400.woff2">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/base.css">
+<style>
+  body{
+    background-color:#050706;
+    background-image:
+      radial-gradient(ellipse at 50% 38%, rgba(1,132,127,.14), transparent 62%),
+      linear-gradient(to right, rgba(1,132,127,.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(1,132,127,.055) 1px, transparent 1px);
+    background-size:100% 100%, calc(100% / 12) 100%, 100% calc(100% / 6);
+    min-height:100vh; min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; overflow:hidden;
+  }
+  .scan{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(47,201,188,.045) 0 2px, transparent 2px 6px);
+    animation:scan 7s linear infinite;
+  }
+  @keyframes scan{ to{ transform:translateY(60px);} }
+  .err-pt{
+    position:fixed; bottom:-24px; z-index:1; width:7px; height:7px;
+    background:var(--green); clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%);
+    opacity:.22; animation:pt-rise linear infinite; pointer-events:none;
+  }
+  @keyframes pt-rise{
+    from{ transform:translateY(0) rotate(0deg); }
+    to{ transform:translateY(-112vh) rotate(340deg); }
+  }
+
+  .err-main{ position:relative; z-index:2; width:100%; max-width:100%; padding:110px 22px 60px; display:flex; flex-direction:column; align-items:center; gap:22px; }
+  .err-tag{ font-size:var(--fs-micro); letter-spacing:.4em; color:var(--green-400); }
+  .err-glitch{
+    font-size:clamp(92px,28vw,380px); letter-spacing:-.03em; line-height:.88;
+    color:var(--paper);
+    animation:glitch-shake 4.2s infinite;
+  }
+  @keyframes glitch-shake{
+    0%,88%,100%{ transform:none; }
+    90%{ transform:translate(3px,-2px); }
+    92%{ transform:translate(-3px,2px); }
+    94%{ transform:translate(2px,1px); }
+    96%{ transform:none; }
+  }
+  .err-term{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; justify-content:center;
+    font-family:var(--font-mono); font-size:clamp(13px,1.5vw,16px);
+    color:var(--green-200); min-height:24px; max-width:100%;
+  }
+  .err-term__prompt{ color:var(--green-400); }
+  #err-term-txt{ min-width:0; overflow-wrap:anywhere; }
+  .err-cursor{ display:inline-block; width:8px; height:1.05em; margin-left:2px; background:var(--green-400); vertical-align:text-bottom; animation:blink 1s steps(1) infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .err-sub{ font-size:var(--fs-small); letter-spacing:.18em; text-transform:uppercase; color:var(--muted-paper); max-width:640px; line-height:1.9; }
+  .err-actions{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+  .err-foot{
+    position:absolute; left:0; right:0; bottom:18px; z-index:2;
+    display:flex; justify-content:space-between; padding:0 var(--space);
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted-paper);
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+  <div id="loader" aria-hidden="true">
+    <div class="loader__scene">
+      <div class="loader__rope"></div>
+      <div class="loader__pendant"></div>
+      <div class="loader__word">
+        <span>F</span><span>R</span><span>E</span><span>Y</span><span class="loader__gem">✦</span>
+      </div>
+    </div>
+    <div class="loader__meta">
+      <span class="loader__label">signal lost</span>
+      <span class="loader__bar"><i></i></span>
+      <span class="loader__pct">000</span>
+    </div>
+  </div>
+
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <header class="site-head">
+    <a class="logo" href="index.html" aria-label="Frey home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="16" fill="currentColor" opacity="0.06"/><path d="M20 14h26v8H29v9h14v8H29v11h-9z" fill="currentColor"/><circle cx="46" cy="46" r="5" fill="#01847F"/></svg>
+      <b>Frey<i>✦</i></b>
+    </a>
+    <nav class="head-nav" aria-label="primary">
+      <a class="head-link" href="index.html">Index</a>
+      <a class="head-link" href="work.html">Work</a>
+      <a class="head-link" href="hobby.html">Hobby</a>
+      <a class="head-link" href="ask.html">Ask</a>
+      <a class="head-cta" href="index.html#choose">选择页 ↑</a>
+    </nav>
+  </header>
+
+  <div class="scan" aria-hidden="true"></div>
+
+  <main class="err-main">
+    <p class="err-tag mono">// 404 — signal lost</p>
+    <h1 class="err-glitch glitch" data-text="404">404</h1>
+    <div class="err-term mono" aria-live="polite">
+      <span class="err-term__prompt">frey@universe:~$</span>
+      <span id="err-term-txt"></span><span class="err-cursor"></span>
+    </div>
+    <p class="err-sub">这个页面不存在 — 它掉进了马尔斯绿的黑洞里。<br>maybe try another door?</p>
+    <div class="err-actions">
+      <a class="btn btn--solid" href="index.html"><span>回到首页</span><span class="arr">→</span></a>
+      <a class="btn" href="index.html#choose"><span>选择页</span></a>
+      <a class="btn btn--paper" href="ask.html"><span>提问箱</span></a>
+    </div>
+  </main>
+
+  <div class="err-foot">
+    <span>FREY ✦ 2026</span>
+    <span>error code 0x00C8</span>
+  </div>
+
+<script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/ui.js"></script>
+<script>
+  /* 漂浮的钻石粒子 */
+  (function () {
+    var colors = ['#01847F', '#2FC9BC', '#9BE8E0', '#F5F6F1'];
+    for (var i = 0; i < 16; i++) {
+      var s = document.createElement('span');
+      s.className = 'err-pt';
+      var size = 4 + Math.random() * 6;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      s.style.left = (2 + Math.random() * 92) + 'vw';
+      s.style.background = colors[Math.floor(Math.random() * colors.length)];
+      s.style.animationDuration = (7 + Math.random() * 9) + 's';
+      s.style.animationDelay = (-Math.random() * 12) + 's';
+      document.body.appendChild(s);
+    }
+  })();
+
+  /* 终端打字 */
+  (function () {
+    var el = document.getElementById('err-term-txt');
+    if (!el) return;
+    var cmd = 'cd ~/lost && ls';
+    var err = 'error: no such file or directory';
+    var i = 0, phase = 'cmd';
+    function tick() {
+      if (phase === 'cmd') {
+        if (i <= cmd.length) { el.textContent = cmd.slice(0, i); i++; setTimeout(tick, 70); }
+        else { phase = 'err'; i = 0; setTimeout(tick, 320); }
+      } else {
+        if (i <= err.length) { el.textContent = cmd + ' ' + err.slice(0, i); i++; setTimeout(tick, 28); }
+        else { setTimeout(function () { el.textContent = ''; i = 0; phase = 'cmd'; setTimeout(tick, 1600); }, 4200); }
+      }
+    }
+    setTimeout(tick, 1200);
+  })();
+</script>
+</body>
+</html>
+
+
+

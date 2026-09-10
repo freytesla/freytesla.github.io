@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Frey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face{
+      font-family:'FK Roman Standard';
+      src:url('assets/fonts/FKRomanStandard-Light.woff2') format('woff2');
+      font-weight:300;
+      font-display:swap;
+    }
+    .site-header{ position:fixed; inset:0; z-index:2; pointer-events:none; }
+    .site-header__content{ position:relative; width:100%; height:100%; }
+    .brand-row{
+      position:absolute; top:12px; left:12px;
+      display:flex; gap:3px; pointer-events:auto;
+    }
+    .h2-alt{
+      position:relative; display:inline-block;
+      overflow:hidden;
+      font-family:'FK Roman Standard', Georgia, serif;
+      font-weight:300;
+      font-size:48px;
+      line-height:44px;
+      letter-spacing:-2px;
+      color:#F2F2F2;
+      user-select:none;
+      cursor:default;
+    }
+    .h2-alt .in{
+      display:inline-block;
+      transition:transform .3s ease, opacity .3s ease;
+    }
+    .brand-row .h2-alt .in{ transition:transform .25s ease, opacity .25s ease; }
+    #brand .h2-alt{ cursor:pointer; }
+    .corner-tr .in, .corner-bl .in, .corner-br .in{ transition:transform .3s ease, opacity .3s ease; }
+    .corner-tr{ position:absolute; top:12px; right:12px; }
+    .corner-bl{ position:absolute; bottom:12px; left:12px; }
+    .corner-br{ position:absolute; bottom:12px; right:12px; }
+
+    .corner-tr .in{ transform:scaleX(-1); }
+
+    .brand-row .letter-r .in{ transform:translateX(-100%); opacity:0; }
+    .brand-row .letter-e .in{ transform:translateX(100%); opacity:0; }
+    .brand-row .letter-y .in{ transform:translateY(100%); opacity:0; }
+    #brand:hover .letter-r .in{ transition-delay:.3s; }
+    #brand:hover .letter-e .in{ transition-delay:.35s; }
+    #brand:hover .letter-y .in{ transition-delay:.45s; }
+    #brand:not(:hover) .letter-e .in{ transition-delay:.06s; }
+    #brand:not(:hover) .letter-r .in{ transition-delay:.16s; }
+
+    #brand:hover .letter-r .in,
+    #brand:hover .letter-e .in,
+    #brand:hover .letter-y .in{ transform:none; opacity:1; }
+    #brand:hover ~ .corner-tr .in{ transform:translateX(100%) scaleX(-1); opacity:0; }
+    #brand:hover ~ .corner-bl .in{ transform:translateX(-100%); opacity:0; }
+    #brand:hover ~ .corner-br .in{ transform:translateY(100%); opacity:0; }
+    html, body{ margin:0; padding:0; height:100%; }
+    body{
+      background-color:#000;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.25'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 50% 44%, rgba(0,140,140,.10), transparent 62%),
+        linear-gradient(to right, rgba(0,140,140,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,140,140,.05) 1px, transparent 1px);
+      background-size: 180px 180px, 100% 100%, calc(100% / 12) 100%, 100% calc(100% / 6);
+    }
+    body{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; gap:2.2rem;
+      font-family:'Montserrat', 'Noto Sans SC', sans-serif;
+    }
+    canvas#fuzzy{ display:block; cursor:default; }
+    .sub{
+      font-family:'Space Mono', monospace;
+      font-weight:400; font-size:14px; letter-spacing:.22em; text-transform:uppercase;
+      color:#008C8C;
+    }
+    .home{
+      position:relative;
+      color:#F2F2F2; text-decoration:none; font-size:14px; font-weight:500;
+      letter-spacing:.18em; text-transform:uppercase; padding-bottom:.3em;
+      transition:color .3s ease;
+    }
+    .home::after{
+      content:""; position:absolute; left:0; bottom:0;
+      width:100%; height:1px; background:#00A6A6;
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .4s ease;
+    }
+    .home:hover::after, .home:focus-visible::after{ transform:scaleX(1); }
+  </style>
+  <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+  <div id="loader" aria-hidden="true">
+    <div class="corner-fly"><span class="cf cf-f">F</span><span class="cf cf-r">R</span><span class="cf cf-e">E</span><span class="cf cf-y">Y</span></div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <div class="progress-pct">0%</div>
+  </div>
+  <div class="site-header">
+    <div class="site-header__content">
+      <div class="brand-row" id="brand">
+        <span class="h2-alt letter-f default"><span class="in">F</span></span>
+        <span class="h2-alt letter-r default"><span class="in">R</span></span>
+        <span class="h2-alt letter-e default"><span class="in">E</span></span>
+        <span class="h2-alt letter-y default"><span class="in">Y</span></span>
+      </div>
+      <span class="h2-alt corner-tr"><span class="in">R</span></span>
+      <span class="h2-alt corner-bl"><span class="in">E</span></span>
+      <span class="h2-alt corner-br"><span class="in">Y</span></span>
+    </div>
+  </div>
+  <canvas id="fuzzy" aria-label="404"></canvas>
+  <p class="sub">Page Not Found · Lost in the grid</p>
+  <a class="home" href="index.html">回到首页 →</a>
+
+  <script src="js/console-art.js"></script>
+  <script src="js/fuzzy-text.js"></script>
+  <script>
+    FuzzyText(document.getElementById('fuzzy'), {
+      text: '404',
+      fontSize: 'clamp(5rem, 26vw, 18rem)',
+      fontWeight: 800,
+      fontFamily: 'Montserrat',
+      color: '#F2F2F2',
+      enableHover: true,
+      baseIntensity: 0.15,
+      hoverIntensity: 0.45,
+      fuzzRange: 24,
+      fps: 60,
+      direction: 'horizontal',
+      clickEffect: true,
+      glitchMode: true,
+      glitchInterval: 2200,
+      glitchDuration: 260,
+      glitchIntensity: 0.45,
+      letterSpacing: 0.02
+    });
+  </script>
+  <script src="js/loader.js"></script>
+
+<script>
+  // 点左上角 FREY 回到页面顶端
+  (function () {
+    var brand = document.getElementById('brand');
+    if (brand) {
+      brand.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  })();
+</script>
+</body>
+</html>

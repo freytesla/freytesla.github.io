@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hobby — Frey</title>
+<meta name="description" content="Frey · Hobby — F1, musicals, music & people I love.">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/syne-800.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-grotesk-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/space-mono-400.woff2">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/hobby.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js" } }
+</script>
+</head>
+<body data-theme="dark">
+
+    <div id="loader" aria-hidden="true">
+    <div class="loader__scene">
+      <div class="loader__rope"></div>
+      <div class="loader__pendant"></div>
+      <div class="loader__word">
+        <span>H</span>
+        <span>O</span>
+        <span>B</span>
+        <span>B</span>
+        <span>Y</span>
+        <span class="loader__gem">✦</span>
+      </div>
+    </div>
+    <div class="loader__meta">
+      <span class="loader__label">f1 · musicals · music</span>
+      <span class="loader__bar"><i></i></span>
+      <span class="loader__pct">000</span>
+    </div>
+  </div>
+<div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <header class="site-head">
+    <a class="logo" href="index.html" aria-label="Frey home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="16" fill="currentColor" opacity="0.06"/><path d="M20 14h26v8H29v9h14v8H29v11h-9z" fill="currentColor"/><circle cx="46" cy="46" r="5" fill="#01847F"/></svg>
+      <b>Frey<i>✦</i></b>
+    </a>
+    <nav class="head-nav" aria-label="primary">
+      <a class="head-link" href="index.html">Index</a>
+      <a class="head-link" href="work.html">Work</a>
+      <a class="head-link is-active" href="hobby.html">Hobby</a>
+      <a class="head-link" href="ask.html">Ask</a>
+      <a class="head-cta" href="index.html#choose">选择页 ↑</a>
+    </nav>
+    <button class="head-burger" aria-label="menu"><i></i><i></i><i></i></button>
+  </header>
+  <div class="head-mobile">
+    <a href="index.html">Index<span>✦</span></a>
+    <a href="work.html">Work<span>✦</span></a>
+    <a href="hobby.html">Hobby<span>✦</span></a>
+    <a href="ask.html">Ask<span>✦</span></a>
+  </div>
+
+  <main>
+    <section class="hobby-hero section" data-reveal>
+      <div class="hobby-hero__bgtext display" aria-hidden="true">HOBBY</div>
+      <div class="wrap">
+        <p class="mono green">02 — HOBBY / 兴趣与热爱</p>
+        <h1 class="hobby-hero__title display">引擎、灯光与唱片<span class="green">.</span></h1>
+        <p class="hobby-hero__sub mono">f1 · 音乐剧 · 音乐 · 我喜欢的人物</p>
+      </div>
+    </section>
+
+    <!-- ===== F1 ===== -->
+    <section id="f1" class="hobby-sec section section--flush">
+      <header class="sec-head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">03 — F1 / 3D 车模</p>
+          <h2 class="hobby-sec__title display">Formula 1<span class="green">.</span></h2>
+        </div>
+        <p class="sec-head__sub">我常看 F1 · 最喜欢的车手是维斯塔潘<br>这台红牛赛车 · 3D 模型</p>
+      </header>
+
+      <div class="f1-grid">
+        <!-- intro -->
+        <aside class="f1-intro" data-reveal>
+          <p class="f1-intro__k mono green">about / 关于</p>
+          <p class="f1-intro__lead display">我常看 F1，最喜欢的车手是维斯塔潘<span class="green">.</span></p>
+          <p class="f1-intro__body">这台 3D 模型是他 2023 赛季驾驶的红牛冠军赛车：前翼、halo、尾翼等细节都有还原。拖动右边的模型，可以从任意角度查看。</p>
+          <ul class="f1-intro__meta mono">
+            <li><span>fav driver</span><b>Max Verstappen</b></li>
+            <li><span>team</span><b>Oracle Red Bull Racing</b></li>
+            <li><span>car</span><b>2023 · champion</b></li>
+          </ul>
+        </aside>
+
+        <!-- 3D model viewer -->
+        <div class="f1-stage f1-stage--3d" data-reveal>
+          <div class="f1-3d" id="f1-3d">
+            <canvas id="f1-canvas" aria-label="红牛 F1 赛车 3D 模型 —— 可拖动旋转、滚轮缩放"></canvas>
+
+            <div class="f1-3d__hud">
+              <p class="f1-3d__hud-k mono">3d model / 车模</p>
+              <p class="f1-3d__hud-s mono">Oracle Red Bull Racing</p>
+            </div>
+
+            <a class="f1-3d__credit mono" href="https://sketchfab.com/3d-models/oracle-red-bull-f1-car-rb19-2023-e4afe46f3aab4b23a418da06fc163821" target="_blank" rel="noopener" title="Oracle Red Bull F1 Car RB19 2023 · Redgrund (Sketchfab)">© Redgrund · Sketchfab · CC-BY 4.0</a>
+
+            <div class="f1-3d__load" id="f1-3d-load" aria-live="polite">
+              <p class="f1-3d__load-t mono green">loading / 模型装载中</p>
+              <div class="f1-3d__bar"><i id="f1-3d-bar"></i></div>
+              <p class="f1-3d__load-p mono"><span id="f1-3d-pct">0</span><span class="green">%</span></p>
+              <p class="f1-3d__file-note mono">不能直接双击打开（浏览器会拦截 3D 模型）<br>请运行根目录的 <b>serve.bat</b>，或手动启动本地服务器后访问</p>
+            </div>
+
+            <div class="f1-3d__status mono" id="f1-3d-status"><i></i><span>正在装载模型…</span></div>
+            <p class="f1-3d__hint mono" id="f1-3d-hint">↻ 拖动旋转 · 滚轮缩放</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== musical ===== -->
+    <section id="musical" class="hobby-sec section section--flush">
+      <header class="sec-head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">04 — MUSICAL / 音乐剧</p>
+          <h2 class="hobby-sec__title display">Spotlight<span class="green">.</span></h2>
+        </div>
+        <p class="sec-head__sub">攒下来的票根，像一颗颗小星星。<br>悬停在上面，听听那晚的掌声。</p>
+      </header>
+
+      <div class="tickets">
+        <!-- 票根信息可自行替换 -->
+        <figure class="ticket" data-reveal style="--d:0s">
+          <svg viewBox="0 0 360 150"><defs><mask id="tk-perf-1" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="150"><rect x="0" y="0" width="360" height="150" fill="#fff"/>
+<circle cx="1" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="120.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="120.0" r="7.5" fill="#000"/>
+</mask></defs><g mask="url(#tk-perf-1)">
+            <rect x="1" y="1" width="358" height="148" rx="10" fill="#F5F6F1"/>
+            
+            <rect x="300" y="0" width="2" height="150" fill="#050706"/>
+            <text x="20" y="42" font-size="30" font-weight="800" fill="#0A0D0C" font-family="Arial">HAMILTON</text>
+            <text x="20" y="64" font-size="12" fill="#01847F" font-family="monospace">音乐剧 · 英文原版</text>
+            <text x="20" y="96" font-size="11" fill="#555" font-family="monospace">2025.11.08 · 上海文化广场</text>
+            <text x="20" y="116" font-size="11" fill="#555" font-family="monospace">座位 A3-12 · 二楼</text>
+            <text x="306" y="120" font-size="10" fill="#555" font-family="monospace">FREY ✦</text>
+            <g stroke="#0A0D0C" stroke-width="2"><line x1="306" y1="20" x2="330" y2="20"/><line x1="310" y1="30" x2="336" y2="30"/><line x1="306" y1="40" x2="328" y2="40"/><line x1="312" y1="50" x2="334" y2="50"/><line x1="306" y1="60" x2="330" y2="60"/></g>
+          </g></svg>
+          <figcaption class="ticket__cap mono"><span>01</span><span>Hamilton</span></figcaption>
+        </figure>
+
+        <figure class="ticket" data-reveal style="--d:.06s">
+          <svg viewBox="0 0 360 150"><defs><mask id="tk-perf-2" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="150"><rect x="0" y="0" width="360" height="150" fill="#fff"/>
+<circle cx="1" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="120.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="120.0" r="7.5" fill="#000"/>
+</mask></defs><g mask="url(#tk-perf-2)">
+            <rect x="1" y="1" width="358" height="148" rx="10" fill="#F5F6F1"/>
+            <rect x="300" y="0" width="2" height="150" fill="#050706"/>
+            <text x="20" y="42" font-size="30" font-weight="800" fill="#0A0D0C" font-family="Arial">歌剧魅影</text>
+            <text x="20" y="64" font-size="12" fill="#01847F" font-family="monospace">音乐剧 · 中文版</text>
+            <text x="20" y="96" font-size="11" fill="#555" font-family="monospace">2025.03.14 · 上海大剧院</text>
+            <text x="20" y="116" font-size="11" fill="#555" font-family="monospace">座位 B2-08 · 池座</text>
+            <text x="306" y="120" font-size="10" fill="#555" font-family="monospace">FREY ✦</text>
+            <g stroke="#0A0D0C" stroke-width="2"><line x1="306" y1="20" x2="330" y2="20"/><line x1="310" y1="30" x2="336" y2="30"/><line x1="306" y1="40" x2="328" y2="40"/><line x1="312" y1="50" x2="334" y2="50"/><line x1="306" y1="60" x2="330" y2="60"/></g>
+          </g></svg>
+          <figcaption class="ticket__cap mono"><span>02</span><span>歌剧魅影</span></figcaption>
+        </figure>
+
+        <figure class="ticket" data-reveal style="--d:.12s">
+          <svg viewBox="0 0 360 150"><defs><mask id="tk-perf-3" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="150"><rect x="0" y="0" width="360" height="150" fill="#fff"/>
+<circle cx="1" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="120.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="120.0" r="7.5" fill="#000"/>
+</mask></defs><g mask="url(#tk-perf-3)">
+            <rect x="1" y="1" width="358" height="148" rx="10" fill="#F5F6F1"/>
+            
+            <rect x="300" y="0" width="2" height="150" fill="#050706"/>
+            <text x="20" y="42" font-size="30" font-weight="800" fill="#0A0D0C" font-family="Arial">RENT</text>
+            <text x="20" y="64" font-size="12" fill="#01847F" font-family="monospace">音乐剧 · 摇滚</text>
+            <text x="20" y="96" font-size="11" fill="#555" font-family="monospace">2024.12.20 · 北京天桥艺术中心</text>
+            <text x="20" y="116" font-size="11" fill="#555" font-family="monospace">座位 C5-03 · 一层</text>
+            <text x="306" y="120" font-size="10" fill="#555" font-family="monospace">FREY ✦</text>
+            <g stroke="#0A0D0C" stroke-width="2"><line x1="306" y1="20" x2="330" y2="20"/><line x1="310" y1="30" x2="336" y2="30"/><line x1="306" y1="40" x2="328" y2="40"/><line x1="312" y1="50" x2="334" y2="50"/><line x1="306" y1="60" x2="330" y2="60"/></g>
+          </g></svg>
+          <figcaption class="ticket__cap mono"><span>03</span><span>Rent</span></figcaption>
+        </figure>
+
+        <figure class="ticket" data-reveal style="--d:.18s">
+          <svg viewBox="0 0 360 150"><defs><mask id="tk-perf-4" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="150"><rect x="0" y="0" width="360" height="150" fill="#fff"/>
+<circle cx="1" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="30.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="52.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="75.0" r="7.5" fill="#000"/>
+<circle cx="1" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="359" cy="97.5" r="7.5" fill="#000"/>
+<circle cx="1" cy="120.0" r="7.5" fill="#000"/>
+<circle cx="359" cy="120.0" r="7.5" fill="#000"/>
+</mask></defs><g mask="url(#tk-perf-4)">
+            <rect x="1" y="1" width="358" height="148" rx="10" fill="#F5F6F1"/>
+            <rect x="300" y="0" width="2" height="150" fill="#050706"/>
+            <text x="20" y="42" font-size="30" font-weight="800" fill="#0A0D0C" font-family="Arial">芝加哥</text>
+            <text x="20" y="64" font-size="12" fill="#01847F" font-family="monospace">音乐剧 · 爵士</text>
+            <text x="20" y="96" font-size="11" fill="#555" font-family="monospace">2024.08.02 · 上海文化广场</text>
+            <text x="20" y="116" font-size="11" fill="#555" font-family="monospace">座位 A1-05 · 一楼</text>
+            <text x="306" y="120" font-size="10" fill="#555" font-family="monospace">FREY ✦</text>
+            <g stroke="#0A0D0C" stroke-width="2"><line x1="306" y1="20" x2="330" y2="20"/><line x1="310" y1="30" x2="336" y2="30"/><line x1="306" y1="40" x2="328" y2="40"/><line x1="312" y1="50" x2="334" y2="50"/><line x1="306" y1="60" x2="330" y2="60"/></g>
+          </g></svg>
+          <figcaption class="ticket__cap mono"><span>04</span><span>芝加哥</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===== music / record player ===== -->
+    <section id="music" class="hobby-sec section section--flush">
+      <header class="sec-head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">05 — MUSIC / 音乐</p>
+          <h2 class="hobby-sec__title display">Listen<span class="green">.</span></h2>
+        </div>
+        <p class="sec-head__sub">一台会自己写歌的唱片机。<br>选一种风格，音乐是实时生成的。</p>
+      </header>
+
+      <div class="deck" data-reveal>
+        <!-- turntable -->
+        <div class="deck__tt">
+          <div class="tt__plinth">
+            <div class="tt__platter">
+              <div class="tt__vinyl">
+                <div class="tt__grooves"></div>
+                <div class="tt__label">
+                  <span class="tt__label-brand">FREY</span>
+                  <span class="tt__label-title">lo-fi rain</span>
+                  <span class="tt__label-sub">side A · 33⅓</span>
+                </div>
+              </div>
+              <div class="tt__spindle"></div>
+            </div>
+            <div class="tt__tonearm">
+              <div class="tt__arm-pivot"></div>
+              <div class="tt__arm" style="--arm:0deg">
+                <div class="tt__arm-body"></div>
+                <div class="tt__headshell"></div>
+              </div>
+            </div>
+            <div class="tt__hint mono">play ▶</div>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div class="deck__ui">
+          <p class="deck__now mono"><span class="green">NOW PLAYING</span><b id="deck-title">lo-fi rain</b></p>
+          <div class="deck__genres" role="tablist" aria-label="音乐风格">
+            <button class="genre is-on" data-genre="lofi">Lo-fi</button>
+            <button class="genre" data-genre="ambient">Ambient</button>
+            <button class="genre" data-genre="jazz">Jazz</button>
+            <button class="genre" data-genre="electro">Electro</button>
+          </div>
+          <div class="deck__play">
+            <button id="deck-play" class="deck__play-btn" aria-label="播放/暂停">
+              <svg viewBox="0 0 24 24" class="ico-play"><path d="M7 4.5 L20 12 L7 19.5 Z" fill="currentColor"/></svg>
+              <svg viewBox="0 0 24 24" class="ico-pause"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>
+            </button>
+            <div class="deck__vol">
+              <span class="mono">vol</span>
+              <input id="deck-vol" type="range" min="0" max="100" value="70" aria-label="音量">
+            </div>
+          </div>
+          <canvas id="deck-viz" width="520" height="120" aria-hidden="true"></canvas>
+          <p class="deck__tip mono">所有音乐由浏览器实时合成 · WebAudio generative</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== people ===== -->
+    <section id="people" class="hobby-sec section section--flush">
+      <header class="sec-head wrap" data-reveal>
+        <div>
+          <p class="sec-head__num">06 — PEOPLE / 我喜欢的人物</p>
+          <h2 class="hobby-sec__title display">Heroes<span class="green">.</span></h2>
+        </div>
+        <p class="sec-head__sub">给我光的人。<br>（示例人物，可自行替换成你的）</p>
+      </header>
+
+      <div class="people">
+        <article class="person" data-reveal>
+          <div class="person__avatar"><span>坂</span></div>
+          <h3 class="person__name display">坂本龙一</h3>
+          <p class="person__role mono">音乐家</p>
+          <p class="person__why">“安静，也可以很有力量。” 他的曲子让我第一次听懂留白。</p>
+        </article>
+        <article class="person" data-reveal style="--d:.06s">
+          <div class="person__avatar"><span>宫</span></div>
+          <h3 class="person__name display">宫崎骏</h3>
+          <p class="person__role mono">动画导演</p>
+          <p class="person__why">想象力不是天赋，是日复一日地相信世界可以更好。</p>
+        </article>
+        <article class="person" data-reveal style="--d:.12s">
+          <div class="person__avatar"><span>草</span></div>
+          <h3 class="person__name display">草间弥生</h3>
+          <p class="person__role mono">艺术家</p>
+          <p class="person__why">把疼痛变成圆点，再变成整个宇宙。勇敢到发光。</p>
+        </article>
+        <article class="person" data-reveal style="--d:.18s">
+          <div class="person__avatar"><span>A</span></div>
+          <h3 class="person__name display">Ada Lovelace</h3>
+          <p class="person__role mono">程序员先驱</p>
+          <p class="person__why">在机器还是计算器的时候，她就已经看见了“诗意的科学”。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="outro" data-reveal>
+    <div class="wrap outro__inner">
+      <p class="outro__label mono"><span class="green">✦</span> next / 下一站</p>
+      <a class="outro__next display" href="work.html">
+        <span class="outro__next-t">Work</span><span class="outro__next-i" aria-hidden="true">↗</span>
+      </a>
+    </div>
+    <div class="wrap outro__bar">
+      <p class="outro__note mono">工程与绘画 · engineering &amp; paintings</p>
+      <a class="outro__back mono" href="index.html#choose">← 回到选择页</a>
+    </div>
+  </footer>
+
+<script src="assets/vendor/lenis.min.js"></script>
+  <script src="assets/js/ui.js"></script>
+<script src="assets/js/hobby.js"></script>
+<script type="module" src="assets/js/hobby-f1.js"></script>
+<script>
+  /* file:// 下浏览器会拦截 ES Module 与 GLB（CORS），这里给用户明确提示而不是一直转圈 */
+  if (location.protocol === 'file:') {
+    var f1Stage = document.getElementById('f1-3d');
+    var f1Tip = document.querySelector('.f1-3d__load-t');
+    var f1Bar = document.getElementById('f1-3d-bar');
+    var f1Pct = document.getElementById('f1-3d-pct');
+    var f1Status = document.getElementById('f1-3d-status');
+    if (f1Stage) f1Stage.classList.add('is-error', 'is-file');
+    if (f1Tip) f1Tip.textContent = '无法直接打开 · 请使用本地服务器';
+    if (f1Bar) f1Bar.style.display = 'none';
+    if (f1Pct) f1Pct.textContent = '!';
+    if (f1Status) {
+      var dot = document.createElement('i');
+      f1Status.textContent = '';
+      f1Status.appendChild(dot);
+      f1Status.appendChild(document.createTextNode('Chrome 禁止 file:// 加载模型 · 见中间提示'));
+    }
+  }
+</script>
+</body>
+</html>
+
+

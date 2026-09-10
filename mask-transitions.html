@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frey · Mask Transitions — 区块过渡遮罩用法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@300;400;500&family=Space+Mono&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#01847F; --green-400:#2FC9BC; --green-100:#D7F4F0;
+  --ink:#0A0D0C; --bg:#050706; --paper:#F5F6F1; --paper-2:#ECEEE6;
+  --muted-ink:rgba(10,13,12,.58); --muted-paper:rgba(245,246,241,.58);
+  --line:rgba(10,13,12,.14); --line-dark:rgba(245,246,241,.16);
+  --font-display:'Syne','Noto Sans SC',sans-serif;
+  --font-body:'Space Grotesk','Noto Sans SC',sans-serif;
+  --font-mono:'Space Mono','Noto Sans SC',monospace;
+  --ease:cubic-bezier(.22,.61,.21,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--green);color:var(--paper)}
+.mono{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+.green{color:var(--green)}
+
+/* ===== 页面骨架 ===== */
+.hd{position:fixed;inset:0 0 auto;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px clamp(20px,4vw,48px);mix-blend-mode:difference;color:#fff}
+.hd b{font-family:var(--font-display);font-weight:800;font-size:20px}
+.hd nav{display:flex;gap:clamp(12px,2vw,26px)}
+.hd nav a{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.7;transition:opacity .3s}
+.hd nav a:hover{opacity:1}
+.progress{position:fixed;left:0;top:0;height:2px;width:100%;background:rgba(1,132,127,.15);z-index:101}
+.progress i{display:block;height:100%;width:0;background:var(--green)}
+
+section{position:relative;min-height:100vh;display:flex;align-items:center;padding:clamp(80px,12vh,140px) clamp(24px,6vw,90px);overflow:hidden}
+.sec-num{position:absolute;top:clamp(20px,5vh,48px);left:clamp(24px,6vw,90px);font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--muted-ink)}
+.sec-tag{position:absolute;top:clamp(20px,5vh,48px);right:clamp(24px,6vw,90px);font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--green-400)}
+.sec-title{font-family:var(--font-display);font-weight:800;font-size:clamp(38px,6vw,84px);letter-spacing:-.03em;line-height:1}
+.sec-desc{max-width:46ch;margin-top:16px;color:var(--muted-ink);font-size:15px;line-height:1.8}
+.paper-sec{background:var(--paper);color:var(--ink)}
+.dark-sec{background:var(--bg);color:var(--paper)}
+.dark-sec .sec-desc{color:var(--muted-paper)}
+
+.intro{min-height:100svh;background:var(--paper);flex-direction:column;align-items:flex-start;justify-content:center}
+.intro h1{font-family:var(--font-display);font-weight:800;font-size:clamp(46px,8vw,120px);letter-spacing:-.04em;line-height:.95}
+.intro h1 .g{color:var(--green)}
+.intro ul{margin-top:36px;display:flex;flex-direction:column;gap:10px;list-style:none}
+.intro li{display:flex;align-items:baseline;gap:14px;font-size:15px}
+.intro li b{font-family:var(--font-mono);font-size:11px;color:var(--green);white-space:nowrap}
+.intro .foot{margin-top:40px;font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--muted-ink)}
+
+/* ============================================================
+   A · 渐变遮罩 mask-image —— 区块边缘柔化/淡出
+   ============================================================ */
+.demo-a{background:linear-gradient(180deg,#0B3D3A 0%,#01847F 45%,#0B3D3A 100%)}
+.demo-a .mask-fade{position:absolute;inset:0;pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 22%,#000 78%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 22%,#000 78%,transparent 100%)}
+.demo-a .mask-fade i{position:absolute;left:50%;top:50%;width:min(70vw,900px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 50% 42%,rgba(215,244,240,.95),rgba(1,132,127,.35) 55%,transparent 72%)}
+.demo-a .mask-fade .line{position:absolute;left:50%;top:50%;width:min(64vw,820px);height:1px;transform:translate(-50%,-50%);background:rgba(245,246,241,.5)}
+.demo-a .txt{position:relative;z-index:2;text-align:center;margin:0 auto;color:var(--paper)}
+.demo-a .txt h2{font-family:var(--font-display);font-weight:800;font-size:clamp(44px,8vw,120px);letter-spacing:-.04em;line-height:1}
+.demo-a .txt .sub{margin-top:14px;color:rgba(245,246,241,.7);font-size:clamp(13px,1.4vw,16px)}
+.demo-a .edge{position:absolute;left:0;right:0;height:120px;pointer-events:none}
+.demo-a .edge--t{top:0;background:linear-gradient(180deg,var(--paper) 0%,transparent 100%)}
+.demo-a .edge--b{bottom:0;background:linear-gradient(180deg,transparent 0%,var(--paper) 100%)}
+
+/* ============================================================
+   B · 圆形遮罩 clip-path circle —— 滚动时从中心/角落展开
+   ============================================================ */
+.demo-b{background:var(--paper);color:var(--ink)}
+.demo-b__inner{position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto}
+.demo-b__inner h2{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,5.6vw,76px);letter-spacing:-.03em;line-height:1.05}
+.demo-b__inner p{margin-top:14px;max-width:46ch;color:var(--muted-ink)}
+.demo-b__veil{position:absolute;inset:0;z-index:3;background:var(--bg);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  clip-path:circle(0% at 50% 50%);
+  -webkit-clip-path:circle(0% at 50% 50%);
+  will-change:clip-path}
+.demo-b__veil .v-txt{text-align:center;font-family:var(--font-display);font-weight:800;font-size:clamp(30px,5vw,68px);letter-spacing:-.03em;line-height:1.1}
+.demo-b__veil .v-txt span{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--green-400);margin-top:14px;text-transform:uppercase}
+
+/* ============================================================
+   C · 擦除遮罩 clip-path inset —— 整块从底部往上揭开
+   ============================================================ */
+.demo-c{background:var(--bg);color:var(--paper);flex-direction:column;justify-content:center}
+.demo-c h2{font-family:var(--font-display);font-weight:800;font-size:clamp(38px,7vw,96px);letter-spacing:-.04em;line-height:1;text-align:center}
+.demo-c h2 .g{color:var(--green-400)}
+.demo-c p{margin-top:16px;text-align:center;color:var(--muted-paper);max-width:52ch}
+.demo-c__wipe{position:absolute;inset:0;z-index:2;background:var(--paper);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  clip-path:inset(0 0 0 0);
+  -webkit-clip-path:inset(0 0 0 0);
+  will-change:clip-path}
+.demo-c__wipe .w-txt{text-align:center}
+.demo-c__wipe .w-txt b{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,6vw,80px);letter-spacing:-.03em;line-height:1}
+.demo-c__wipe .w-txt span{display:block;margin-top:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--green);text-transform:uppercase}
+
+/* ============================================================
+   D · 文字遮罩 background-clip:text —— 背景穿进字形里
+   ============================================================ */
+.demo-d{background:var(--paper)}
+.demo-d__stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.demo-d__word{font-family:var(--font-display);font-weight:800;font-size:clamp(90px,22vw,340px);letter-spacing:-.05em;line-height:1;
+  color:transparent;-webkit-text-fill-color:transparent;
+  background-image:linear-gradient(90deg,var(--green-100) 0%,var(--green) 40%,#0B3D3A 62%,var(--paper) 63%,var(--ink) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  background-size:220% 100%;background-position:100% 0;
+  will-change:background-position;
+  user-select:none}
+.demo-d__word.is-paint{background-position:0 0}
+.demo-d__meta{position:absolute;left:clamp(24px,6vw,90px);bottom:clamp(24px,6vh,60px);max-width:44ch;z-index:2}
+.demo-d__meta .mono{color:var(--green)}
+.demo-d__meta p{margin-top:8px;color:var(--muted-ink);font-size:14px;line-height:1.7}
+
+/* ============================================================
+   E · 窗帘遮罩 overlay —— 两块覆盖层左右/上下滑开
+   ============================================================ */
+.demo-e{background:linear-gradient(180deg,#0B3D3A,#01847F 60%,#0B3D3A);color:var(--paper)}
+.demo-e .e-txt{position:relative;z-index:2;text-align:center;margin:0 auto}
+.demo-e .e-txt h2{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,6.6vw,90px);letter-spacing:-.03em;line-height:1}
+.demo-e .e-txt p{margin-top:14px;color:rgba(245,246,241,.75)}
+.curtain{position:absolute;inset:0;z-index:3;display:flex;pointer-events:none}
+.curtain span{flex:1;background:var(--paper);transform:translateX(0);will-change:transform;transition:transform 1.1s var(--ease-out)}
+.curtain span:nth-child(2){border-left:1px solid var(--line)}
+.curtain.is-open span{transform:translateX(-101%)}
+.curtain.is-open span:nth-child(2){transform:translateX(101%)}
+
+/* ===== 页脚提示 ===== */
+.outro{min-height:40vh;background:var(--paper);flex-direction:column;align-items:flex-start;justify-content:center}
+.outro h2{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,4.6vw,60px);letter-spacing:-.03em}
+.outro p{margin-top:12px;color:var(--muted-ink);max-width:60ch;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div class="progress"><i id="bar"></i></div>
+<header class="hd">
+  <b>Frey <span class="green">✦</span></b>
+  <nav>
+    <a href="#demo-a">A Fade</a>
+    <a href="#demo-b">B Circle</a>
+    <a href="#demo-c">C Wipe</a>
+    <a href="#demo-d">D Text</a>
+    <a href="#demo-e">E Curtain</a>
+  </nav>
+</header>
+
+<!-- 封面 -->
+<section class="intro">
+  <p class="mono green">MASK / CLIP-PATH / OVERLAY · 区块过渡的五种遮罩用法</p>
+  <h1>遮罩不遮<br>让区块<span class="g">长</span>出来</h1>
+  <ul>
+    <li><b>01 FADE</b> mask-image 渐变：区块边缘柔化，像光晕一样化开</li>
+    <li><b>02 CIRCLE</b> clip-path circle：暗色从中心圆形成长，盖住旧区块</li>
+    <li><b>03 WIPE</b> clip-path inset：整块从下往上揭开，像翻页</li>
+    <li><b>04 TEXT</b> background-clip:text：背景色穿进大字字形里，滚动染色</li>
+    <li><b>05 CURTAIN</b> overlay 遮罩层：两块纸面左右滑开，露出下一层</li>
+  </ul>
+  <p class="foot">向下滚动 → 每个 demo 都是纯 CSS + 原生 JS，可直接在本地打开</p>
+</section>
+
+<!-- A · 渐变遮罩 -->
+<section id="demo-a" class="demo-a">
+  <div class="mask-fade">
+    <i></i>
+    <span class="line"></span>
+  </div>
+  <div class="edge edge--t"></div>
+  <div class="edge edge--b"></div>
+  <div class="txt">
+    <p class="mono" style="color:var(--green-400);margin-bottom:14px">A · mask-image gradient</p>
+    <h2>光晕化开</h2>
+    <p class="sub">mask 的黑色部分保留、透明部分隐去 —— 上下边缘渐隐，区块像从背景里「透」出来</p>
+  </div>
+</section>
+
+<!-- B · 圆形遮罩 -->
+<section id="demo-b" class="demo-b">
+  <div class="sec-num">B · CLIP-PATH CIRCLE</div>
+  <div class="sec-tag">scroll → 圆心生长</div>
+  <div class="demo-b__inner">
+    <h2>一圈一圈<br>盖住旧区块</h2>
+    <p>遮罩层用 <span class="mono green">clip-path:circle(r% at 50% 50%)</span>，滚动进度驱动半径 r。进入视口时从 0% 长到 150%，暗色区块从圆心「吞掉」纸面区块。</p>
+  </div>
+  <div class="demo-b__veil" id="veil-b">
+    <div class="v-txt">拉长石<br><span>labradorite · 从中心展开</span></div>
+  </div>
+</section>
+
+<!-- C · 擦除遮罩 -->
+<section id="demo-c" class="demo-c">
+  <div class="sec-num" style="color:var(--muted-paper)">C · CLIP-PATH INSET</div>
+  <div class="sec-tag">scroll → 自下而上揭开</div>
+  <h2>像揭盖一样<br>露出 <span class="g">MARRS GREEN</span></h2>
+  <p>用 <span class="mono" style="color:var(--green-400)">clip-path:inset(0 0 X% 0)</span>，X 随滚动从 100 → 0。纸面遮罩层整体从底部往上消失，露出背后的暗色区块 —— 适合做成「翻页 / 揭幕」感。</p>
+  <div class="demo-c__wipe" id="wipe-c">
+    <div class="w-txt"><b>WIPE ✦</b><span>纸面被揭开</span></div>
+  </div>
+</section>
+
+<!-- D · 文字遮罩 -->
+<section id="demo-d" class="demo-d">
+  <div class="sec-num">D · BACKGROUND-CLIP:TEXT</div>
+  <div class="sec-tag">scroll → 染色进度</div>
+  <div class="demo-d__stage"><div class="demo-d__word" id="word-d">FREY</div></div>
+  <div class="demo-d__meta">
+    <p class="mono">文字本身当遮罩</p>
+    <p>字形作为「镂空」：背景是一段绿→黑渐变，滚动时 <span class="mono green">background-position</span> 从左往右推进，等于用滚动「给字染色」。你 hero 里的 FREY 大字也可以这么玩。</p>
+  </div>
+</section>
+
+<!-- E · 窗帘遮罩 -->
+<section id="demo-e" class="demo-e">
+  <div class="sec-num" style="color:rgba(245,246,241,.5)">E · OVERLAY CURTAIN</div>
+  <div class="sec-tag">scroll → 窗帘滑开</div>
+  <div class="e-txt">
+    <p class="mono" style="color:var(--green-100);margin-bottom:14px">遮罩层本身也是一种「过渡」</p>
+    <h2>幕布拉开<br>才见真章</h2>
+    <p>两块纸面 div 叠在区块上方（z-index 更高），进入视口后向左右 <span class="mono" style="color:var(--green-100)">translateX</span> 滑开。过渡的不是内容，而是盖在内容上面的「帘子」。</p>
+  </div>
+  <div class="curtain" id="curtain-e"><span></span><span></span></div>
+</section>
+
+<!-- 收尾 -->
+<section class="outro">
+  <p class="mono green">小结</p>
+  <h2>什么时候用哪一种？</h2>
+  <p>
+    · 想让区块「融入」背景 → <b>A 渐变遮罩</b>（mask-image，边缘柔和）；<br>
+    · 想让新区块「生长」盖住旧的 → <b>B 圆形 / C 擦除</b>（clip-path，几何边界）；<br>
+    · 想让背景色「穿进」文字 → <b>D 文字遮罩</b>（background-clip:text）；<br>
+    · 想保留内容、只动「帘子」→ <b>E 遮罩层 overlay</b>（叠层滑开）。
+  </p>
+</section>
+
+<script>
+/* 顶部滚动进度条 */
+const bar = document.getElementById('bar');
+addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - innerHeight;
+  bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+}, { passive:true });
+
+/* 每个 demo 的进入进度：0 ~ 1（section 进入视口到下边缘贴住视口上缘） */
+function progressOf(elm){
+  const r = elm.getBoundingClientRect();
+  const vh = innerHeight;
+  const total = r.height + vh;
+  return Math.min(1, Math.max(0, (vh - r.top) / total));
+}
+function clamp(v, a, b){ return Math.min(b, Math.max(a, v)); }
+
+/* B · 圆形展开：clip-path circle(0% → 150%) */
+const veilB = document.getElementById('veil-b');
+function updateB(){
+  const p = progressOf(document.getElementById('demo-b'));
+  veilB.style.clipPath = `circle(${Math.pow(p,1.6)*150}% at 50% 50%)`;
+  veilB.style.webkitClipPath = veilB.style.clipPath;
+}
+
+/* C · 擦除：inset(0 0 100% → 0%)，滚动经过时揭开 */
+const wipeC = document.getElementById('wipe-c');
+function updateC(){
+  const p = progressOf(document.getElementById('demo-c'));
+  const bot = Math.pow(p,1.3)*100;
+  wipeC.style.clipPath = `inset(0 0 ${bot}% 0)`;
+  wipeC.style.webkitClipPath = wipeC.style.clipPath;
+}
+
+/* D · 文字染色：滚动驱动 background-position */
+const wordD = document.getElementById('word-d');
+function updateD(){
+  const p = progressOf(document.getElementById('demo-d'));
+  const x = 100 - p * 100;                    /* 100% → 0% */
+  wordD.style.backgroundPosition = `${x}% 0`;
+}
+
+/* E · 窗帘：进入视口前半程滑开 */
+const curtainE = document.getElementById('curtain-e');
+function updateE(){
+  const p = progressOf(document.getElementById('demo-e'));
+  curtainE.classList.toggle('is-open', p > .12);
+}
+
+function tick(){
+  updateB(); updateC(); updateD(); updateE();
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* 交互：B / C / D 区块自身可见性由滚动控制，无需额外 observer；
+   E 的窗帘在返回顶部时会自动合上（class 根据 p 切换）。 */
+</script>
+</body>
+</html>
+

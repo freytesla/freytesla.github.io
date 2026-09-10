@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Frey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    @font-face{
+      font-family:'FK Roman Standard';
+      src:url('assets/fonts/FKRomanStandard-Light.woff2') format('woff2');
+      font-weight:300;
+      font-display:swap;
+    }
+    html, body{ margin:0; padding:0; height:100%; background:#000; }
+    .site-header{ position:fixed; inset:0; }
+    .site-header__content{ position:relative; width:100%; height:100%; }
+    .brand-row{
+      position:absolute; top:12px; left:12px;
+      display:flex; gap:3px;
+    }
+    .h2-alt{
+      position:relative; display:inline-block;
+      overflow:hidden;                 /* 裁切在自己 span 区域里 */
+      font-family:'FK Roman Standard', Georgia, serif;
+      font-weight:300;
+      font-size:48px;
+      line-height:44px;
+      letter-spacing:-2px;
+      color:#F2F2F2;
+      user-select:none;
+      cursor:default;
+    }
+    .h2-alt .in{
+      display:inline-block;
+      transition:transform .3s ease, opacity .3s ease;
+    }
+    /* 左上排：快；角字母：慢 */
+    .brand-row .h2-alt .in{ transition:transform .25s ease, opacity .25s ease; }
+    #brand .h2-alt{ cursor:pointer; }
+    .corner-tr .in, .corner-bl .in, .corner-br .in{ transition:transform .3s ease, opacity .3s ease; }
+    .corner-tr{ position:absolute; top:12px; right:12px; }
+    .corner-bl{ position:absolute; bottom:12px; left:12px; }
+    .corner-br{ position:absolute; bottom:12px; right:12px; }
+
+    /* 右上角 R 常显，保持左右翻转 */
+    .corner-tr .in{ transform:scaleX(-1); }
+
+    /* 左上排 R/E/Y 默认隐藏，位移 10px（只在自己 span 内淡入） */
+    .brand-row .letter-r .in{ transform:translateX(-100%); opacity:0; }
+    .brand-row .letter-e .in{ transform:translateX(100%); opacity:0; }
+    .brand-row .letter-y .in{ transform:translateY(100%); opacity:0; }
+    /* hover 阻尼：只有左上排延迟 0.2s；角字母不延迟直接淡出；淡出 Y 先走，R/E 延迟 0.06s */
+    #brand:hover .letter-r .in{ transition-delay:.3s; }
+    #brand:hover .letter-e .in{ transition-delay:.35s; }
+    #brand:hover .letter-y .in{ transition-delay:.45s; }
+    #brand:not(:hover) .letter-e .in{ transition-delay:.06s; }
+    #brand:not(:hover) .letter-r .in{ transition-delay:.16s; }
+
+    /* 悬停左上角 FREY 区域 */
+    #brand:hover .letter-r .in,
+    #brand:hover .letter-e .in,
+    #brand:hover .letter-y .in{ transform:none; opacity:1; }
+    #brand:hover ~ .corner-tr .in{ transform:translateX(100%) scaleX(-1); opacity:0; }
+    #brand:hover ~ .corner-bl .in{ transform:translateX(-100%); opacity:0; }
+    #brand:hover ~ .corner-br .in{ transform:translateY(100%); opacity:0; }
+
+    /* 底部居中的 scroll down 提示 */
+    .scroll-hint{
+      position:absolute;
+      left:50%;
+      bottom:22px;
+      transform:translateX(-50%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      color:#F2F2F2;
+      opacity:0;
+      animation:scroll-hint-in .9s ease .9s forwards;
+      user-select:none;
+      pointer-events:none;
+    }
+    .scroll-hint__text{
+      font-family:'FK Roman Standard', Georgia, serif;
+      font-weight:300;
+      font-size:12px;
+      letter-spacing:0.4em;
+      text-indent:0.4em;
+      opacity:.65;
+    }
+    .scroll-hint__line{
+      position:relative;
+      width:1px;
+      height:38px;
+      overflow:hidden;
+      background:linear-gradient(to bottom, rgba(242,242,242,.5), rgba(242,242,242,0));
+    }
+    .scroll-hint__line::after{
+      content:'';
+      position:absolute;
+      top:-12px;
+      left:0;
+      width:100%;
+      height:12px;
+      background:#F2F2F2;
+      animation:scroll-hint-drop 1.9s cubic-bezier(.33,.1,.36,1) infinite;
+    }
+    @keyframes scroll-hint-drop{
+      0%{ transform:translateY(0); opacity:1; }
+      70%,100%{ transform:translateY(50px); opacity:0; }
+    }
+    @keyframes scroll-hint-in{
+      from{ opacity:0; transform:translateX(-50%) translateY(10px); }
+      to{ opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+
+    .menu{
+      position:fixed; top:16px; left:50%; transform:translateX(-50%);
+      z-index:3;
+      display:flex; align-items:center; gap:2.2rem;
+      font-family:'Montserrat', 'Noto Sans SC', sans-serif;
+      font-weight:400;
+      font-size:17px; letter-spacing:.08em; text-transform:uppercase;
+    }
+    .menu a{
+      position:relative; color:#F2F2F2; text-decoration:none;
+      padding-bottom:.25em; transition:color .3s ease;
+    }
+    .menu a::after{
+      content:""; position:absolute; left:0; bottom:0;
+      width:100%; height:1px; background:#00A6A6;
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .4s ease;
+    }
+    .menu a:hover{ color:#00A6A6; }
+    .menu a:hover::after, .menu a:focus-visible::after{ transform:scaleX(1); }
+    .menu .sep{ width:1px; height:14px; background:rgba(242,242,242,.18); }
+
+    /* 两层鼠标视差：前=项链，后=人物剪影 */
+    .parallax{
+      position:relative; width:100%; height:100vh; z-index:0;
+      pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+    }
+    /* slogan 区：滚动下来出现 */
+    .scroll-hint{ transition:opacity .5s ease, visibility .5s ease; }
+    /* slogan：滚动驱动单词切换，字体放大 */
+    .slogan{
+      position:relative; z-index:0; height:300vh; background:#000;
+    }
+    .slogan-stage{
+      position:sticky; top:0; height:100vh; overflow:hidden;
+    }
+    .slogan-word{
+      position:absolute; left:50%; top:50%;
+      font-family:Montserrat, sans-serif; font-weight:900;
+      font-size:clamp(64px, 14vw, 200px); color:#F2F2F2;
+      white-space:nowrap;
+      opacity:0; transform:translate(-50%,-50%) translateY(60px);
+      transition:transform .55s cubic-bezier(.22,.61,.36,1), opacity .55s ease;
+      will-change:transform, opacity;
+    }
+    .slogan-word.on{ opacity:1; transform:translate(-50%,-50%) translateY(0); }
+    .slogan-word.out-up{ opacity:0; transform:translate(-50%,-50%) translateY(-60px); }
+    .slogan-word.out-down{ opacity:0; transform:translate(-50%,-50%) translateY(60px); }
+    .slogan-word.above{ opacity:0; transform:translate(-50%,-50%) translateY(-60px); }
+    .parallax .layer{ position:absolute; top:50%; left:50%; margin:0; will-change:transform; }
+    .parallax .back{ width:min(56vh,360px); color:#F2F2F2; opacity:.42; }
+    .parallax .front{
+      width:min(36vh,260px); height:auto; opacity:1;
+      border:1px solid rgba(0,140,140,.55);
+      border-radius:2px;
+      filter:drop-shadow(0 0 26px rgba(0,140,140,.5));
+    }
+  </style>
+
+  <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+  <div id="loader" aria-hidden="true">
+    <div class="corner-fly"><span class="cf cf-f">F</span><span class="cf cf-r">R</span><span class="cf cf-e">E</span><span class="cf cf-y">Y</span></div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <div class="progress-pct">0%</div>
+  </div>
+  <nav class="menu" aria-label="主导航">
+    <a href="index.html">Home</a>
+    <span class="sep"></span>
+    <a href="#">Work</a>
+    <span class="sep"></span>
+    <a href="#">Hobby</a>
+    <span class="sep"></span>
+    <a href="#">Ask</a>
+    <span class="sep"></span>
+    <a href="#">About</a>
+  </nav>
+
+  <div class="parallax" aria-hidden="true">
+    <img class="layer back" id="silhouette" src="assets/silhouette.svg" alt="">
+    <img class="layer front" id="necklace-img" src="assets/labradorite.png" alt="拉长石">
+  </div>
+
+  <section class="slogan" id="slogan">
+    <div class="slogan-stage">
+      <div class="slogan-word">Coder</div>
+      <div class="slogan-word">Creator</div>
+      <div class="slogan-word">Explorer</div>
+    </div>
+  </section>
+
+  <div class="site-header">
+    <div class="site-header__content">
+      <div class="brand-row" id="brand">
+        <span class="h2-alt letter-f default"><span class="in">F</span></span>
+        <span class="h2-alt letter-r default"><span class="in">R</span></span>
+        <span class="h2-alt letter-e default"><span class="in">E</span></span>
+        <span class="h2-alt letter-y default"><span class="in">Y</span></span>
+      </div>
+      <span class="h2-alt corner-tr"><span class="in">R</span></span>
+      <span class="h2-alt corner-bl"><span class="in">E</span></span>
+      <span class="h2-alt corner-br"><span class="in">Y</span></span>
+      <div class="scroll-hint">
+        <span class="scroll-hint__text">SCROLL DOWN</span>
+        <span class="scroll-hint__line"></span>
+      </div>
+    </div>
+  </div>
+  <script src="js/console-art.js"></script>
+  <script src="js/parallax.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/slogan-scroll.js"></script>
+
+<script>
+  // 点左上角 FREY 回到页面顶端
+  (function () {
+    var brand = document.getElementById('brand');
+    if (brand) {
+      brand.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  })();
+</script>
+</body>
+</html>
