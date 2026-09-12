@@ -241,14 +241,19 @@
       var base = parseFloat(row.dataset.speed) || 30;   // px/sec
       var slow = parseFloat(row.dataset.slow) || 0.15;  // hover speed ratio
       var speed = base, target = base, x = 0, last = performance.now();
-      function half() { return track.scrollWidth / 2; }
+      function unitWidth() {
+        var group = track.querySelector('.mq-group');
+        return group ? group.getBoundingClientRect().width : track.scrollWidth / 2;
+      }
       function step(now) {
         var dt = Math.min((now - last) / 1000, 0.05);
         last = now;
         speed += (target - speed) * Math.min(1, dt * 3);   // damping
         x -= speed * dt;
-        var h = half();
-        if (h > 0 && x <= -h) x += h;      // seamless wrap (2 identical halves)
+        var unit = unitWidth();
+        if (unit > 0) {
+          while (x <= -unit) x += unit;    // seamless wrap by one exact text group
+        }
         track.style.transform = 'translateX(' + x.toFixed(2) + 'px)';
         requestAnimationFrame(step);
       }
@@ -278,20 +283,35 @@
     var body = document.body;
     var fixed = body.getAttribute('data-theme'); // pages with fixed theme
     if (fixed) return;
-    /* theme follows the section behind the fixed header (probe below the header),
-       so the header text never turns invisible against a mismatched background */
-    function pick() {
-      if (!document.elementsFromPoint) return;
-      var list = document.elementsFromPoint(innerWidth / 2, 55);
+    var head = document.querySelector('.site-head');
+    var items = head ? head.querySelectorAll('.logo, .head-link, .head-cta, .head-burger') : [];
+    if (head) head.classList.add('site-head--adaptive');
+    // Hit testing respects the currently rendered clip-path, even while the
+    // scrub animation continues after the last wheel/scroll event.
+    function themeAt(x, y) {
+      var list = document.elementsFromPoint(x, y);
       for (var i = 0; i < list.length; i++) {
         var el = list[i];
         if (!el || !el.closest) continue;
-        var sec = el.closest('[data-theme]');
-        if (sec) { body.setAttribute('data-theme', sec.getAttribute('data-theme')); return; }
+        if (el.closest('.site-head, .head-mobile')) continue;
+        var sec = el.closest('[data-theme], .theme-dark, .theme-paper');
+        if (sec && sec !== body) return sec.getAttribute('data-theme') || (sec.classList.contains('theme-dark') ? 'dark' : 'paper');
       }
+      return body.getAttribute('data-theme') || 'paper';
+    }
+    function pick() {
+      if (!document.elementsFromPoint || body.classList.contains('menu-open')) return;
+      var theme = themeAt(innerWidth / 2, 55);
+      body.setAttribute('data-theme', theme);
+      items.forEach(function (item) {
+        // The header gradient is a shared backdrop: text must match it,
+        // including while the page beneath is only partly revealed.
+        if (item.getAttribute('data-nav-theme') !== theme) item.setAttribute('data-nav-theme', theme);
+      });
     }
     window.addEventListener('scroll', pick, { passive: true });
     window.addEventListener('resize', pick);
+    window.addEventListener('frey:scene-frame', pick);
     pick();
   }
 

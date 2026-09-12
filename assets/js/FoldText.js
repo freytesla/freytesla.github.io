@@ -145,7 +145,10 @@
       return timeline;
     }
 
-    if (trigger === 'hover') {
+    if (trigger === 'manual') {
+      // An external scroll timeline owns the pieces, including reverse playback.
+      global.gsap.set(pieces, { opacity: 1, rotateX: 0, rotateY: 0, '--fold-crease': 0, transformOrigin: hingeConfig.origin });
+    } else if (trigger === 'hover') {
       global.gsap.set(pieces, { opacity: 1, rotateX: 0, rotateY: 0, '--fold-crease': 0, transformOrigin: hingeConfig.origin });
       hoverHandler = function () { play(false); };
       root.addEventListener('mouseenter', hoverHandler);

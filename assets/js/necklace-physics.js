@@ -22,7 +22,7 @@ const OPT = Object.assign({
 }, window.FREY_NECKLACE_OPTIONS || {});
 // 吊坠物理参数：sway 回正力度 / damping 摆动阻尼 / inertia 惯性(拖动滞后) /
 // twistSpring+twistDamping 绕竖轴扭转 / maxOmega 角速度上限
-const PEND = Object.assign({ sway: 11.0, damping: 2.0, inertia: 0.9, twistSpring: 1.2, twistDamping: 1.0, maxOmega: 12,
+const PEND = Object.assign({ sway: 11.0, damping: 2.0, inertia: 0.9, twistSpring: 1.2, twistDamping: 1.0, maxOmega: 12, yawRestitution: 0.35,
   frontBack: 1.4, spin: 0.9, motionFreq: 1.85 },   // 前后摆动量 / 左右转动量 / 频率
   OPT.pendulum || {});
 const wrap = document.getElementById(OPT.stageId) || document.getElementById('stage');
@@ -678,9 +678,10 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     effUp.copy(UP2).addScaledVector(pend.accel, -(PEND.inertia * pend.revBoost) / rope.gravity);   // 用当前 g 归一化，换 g 不改变甩动幅度   // 惯性方向（负号：坠体与运动同向甩）
     if (effUp.lengthSq() < 1e-8) effUp.copy(UP2); else effUp.normalize();
     // 链子切线 & 参考正面（绕竖轴扭转的目标）
+    // 用世界竖直方向做参考，避免松手瞬间的挂点加速度把石头扭到侧面
     chainTang.set(SAMPLE.tx, SAMPLE.ty, SAMPLE.tz);
     if (chainTang.lengthSq() < 1e-10) chainTang.set(0, 1, 0); else chainTang.normalize();
-    chainSide.crossVectors(chainTang, effUp);
+    chainSide.crossVectors(chainTang, UP2);
     if (chainSide.lengthSq() < 1e-10) chainSide.set(0, 0, 1); else chainSide.normalize();
 
     pendUp.set(0, 1, 0).applyQuaternion(pend.q);
@@ -716,6 +717,41 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
       pend.q.premultiply(dq).normalize();
     }
 
+    if (!stoneDrag) {
+      // ---- 硬限制：倾斜 ≤ maxTiltDeg，左右旋转 ≤ maxYawDeg ----
+      pendUp.set(0, 1, 0).applyQuaternion(pend.q);
+      const tiltDeg = Math.acos(clamp(pendUp.y, -1, 1)) * 180 / Math.PI;
+      pend.lastTilt = tiltDeg;
+      if (tiltDeg > PEND.maxTiltDeg) {
+        clampAxis.crossVectors(pendUp, UP2);
+        if (clampAxis.lengthSq() > 1e-10) {
+          clampAxis.normalize();
+          clampQ.setFromAxisAngle(clampAxis, (tiltDeg - PEND.maxTiltDeg) * Math.PI / 180);
+          pend.q.premultiply(clampQ).normalize();
+          pend.omega.multiplyScalar(0.6);   // 撞到上限时顺便卸掉一点角速度，避免顶住抖
+        }
+      }
+      // 左右旋转（绕竖轴）限制：以链子侧面方向为目标
+      pendUp.set(0, 1, 0).applyQuaternion(pend.q);
+      pendSide.set(0, 0, 1).applyQuaternion(pend.q);
+      aimSide.copy(chainSide).addScaledVector(pendUp, -chainSide.dot(pendUp));
+      if (aimSide.lengthSq() > 1e-10) {
+        aimSide.normalize();
+        clampAxis.crossVectors(pendSide, aimSide);
+        const yaw = Math.atan2(clampAxis.dot(pendUp), pendSide.dot(aimSide)) * 180 / Math.PI;
+        pend.lastYaw = yaw;
+        if (Math.abs(yaw) > PEND.maxYawDeg) {
+          const excess = (Math.abs(yaw) - PEND.maxYawDeg) * Math.PI / 180 * Math.sign(yaw);
+          clampQ.setFromAxisAngle(pendUp, excess);
+          pend.q.premultiply(clampQ).normalize();
+          // 不是停在边界：把向外的扭转速度反射回来，形成回弹
+          const yawVel = pend.omega.dot(pendUp);
+          if (yaw * yawVel < 0) {
+            pend.omega.addScaledVector(pendUp, -yawVel * (1 + PEND.yawRestitution));
+          }
+        }
+      }
+    }
     pendantAnchor.quaternion.copy(pend.q);
     pendUp.set(0, 1, 0).applyQuaternion(pend.q);
     pendantAnchor.position.set(SAMPLE.x, SAMPLE.y, SAMPLE.z).addScaledVector(pendUp, -PENDANT_GAP);
@@ -755,6 +791,9 @@ const effUp = new THREE.Vector3();
 const torque = new THREE.Vector3();
 const twistAxis = new THREE.Vector3();
 const tiltAxis = new THREE.Vector3();
+const clampAxis = new THREE.Vector3();
+const aimSide = new THREE.Vector3();
+const clampQ = new THREE.Quaternion();
 const dq = new THREE.Quaternion();
 const pend = { q: new THREE.Quaternion(), omega: new THREE.Vector3(), accel: new THREE.Vector3(), lastPos: new THREE.Vector3(), lastVel: new THREE.Vector3(), prevSlideV: 0, revBoost: 1, revKick: 0, maxV: 0, init: false };
 /* ============================================================
@@ -889,8 +928,10 @@ function buildKitePendant(chainSilver, silver, stoneFront, stoneBack, stoneSide)
   const gemGeo = new THREE.ExtrudeGeometry(kite, {
     depth: 0.08, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.05, bevelSegments: 6, curveSegments: 40
   });
+  gemGeo.computeBoundingBox();
+  const gemCenter = gemGeo.boundingBox.getCenter(new THREE.Vector3());
   const faces = splitStoneFaces(gemGeo, 0.35);
-  const off = { x: 0, y: -0.16 - T, z: -(0.08 + 0.06 * 2) / 2 };   // 石头下来一点
+  const off = { x: -gemCenter.x, y: -0.16 - T, z: -gemCenter.z };   // 石头下来一点；X/Z 对齐扣环中心
   const front = new THREE.Mesh(faces.front, stoneFront); front.position.set(off.x, off.y, off.z); g.add(front);
   const back = new THREE.Mesh(faces.back, stoneBack);   back.position.set(off.x, off.y, off.z); g.add(back);
   const side = new THREE.Mesh(faces.side, stoneSide);   side.position.set(off.x, off.y, off.z); g.add(side);

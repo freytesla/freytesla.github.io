@@ -14,10 +14,11 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
-<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/base.css?v=nav-gradient-4">
 <link rel="stylesheet" href="assets/css/work.css">
+<link rel="stylesheet" href="assets/css/exhibition.css?v=1">
 </head>
-<body data-theme="dark">
+<body class="theme-dark">
 
     <div id="loader" aria-hidden="true">
     <div class="loader__scene">
@@ -62,17 +63,18 @@
   </div>
 
   <main>
-    <section class="work-hero section" data-reveal>
+    <section class="work-hero section" data-theme="dark">
       <div class="work-hero__bgtext display" aria-hidden="true">WORK</div>
       <div class="wrap">
         <p class="mono green">01 — WORK / PORTFOLIO</p>
         <h1 class="work-hero__title display">我做过 &amp; 我画过<span class="green">.</span></h1>
-        <p class="work-hero__sub mono">滚动画廊 · 滚轮横向滑动 / scroll ↓ to explore</p>
+        <p class="work-hero__sub mono">从代码到画面。两种方式，一样的好奇心。</p>
+        <nav class="gallery-jump mono" aria-label="作品分类"><a href="#eng">工程项目 ↓</a><a href="#paint">绘画作品 ↓</a></nav>
       </div>
     </section>
 
     <!-- ===== engineering ===== -->
-    <section id="eng" class="gallery section section--flush">
+    <section id="eng" class="gallery section section--flush project-studies" data-theme="dark">
       <header class="gallery__head wrap" data-reveal>
         <div>
           <p class="sec-head__num">02 — ENGINEERING / 工程作品</p>
@@ -150,11 +152,11 @@
           </article>
         </div>
       </div>
-      <p class="gallery__foot mono">滚轮 / 拖拽横向滑动 — 共 06 个项目</p>
+      <p class="gallery__foot mono">06 个项目 / 点击项目预览，查看大图与说明</p>
     </section>
 
     <!-- ===== paintings ===== -->
-    <section id="paint" class="gallery gallery--paint section section--flush">
+    <section id="paint" class="gallery gallery--paint section section--flush painting-room" data-theme="paper">
       <header class="gallery__head wrap" data-reveal>
         <div>
           <p class="sec-head__num">03 — PAINTINGS / 绘画作品</p>
@@ -208,11 +210,11 @@
           </figure>
         </div>
       </div>
-      <p class="gallery__foot mono">滚轮 / 拖拽横向滑动 — 共 06 幅画</p>
+      <p class="gallery__foot mono">06 幅作品 / 放大后可用左右方向键切换</p>
     </section>
   </main>
 
-  <footer class="outro" data-reveal>
+  <footer class="outro" data-theme="dark">
     <div class="wrap outro__inner">
       <p class="outro__label mono"><span class="green">✦</span> next / 下一站</p>
       <a class="outro__next display" href="hobby.html">
@@ -221,13 +223,16 @@
     </div>
     <div class="wrap outro__bar">
       <p class="outro__note mono">兴趣与热爱 · f1 · musicals · music</p>
-      <a class="outro__back mono" href="index.html#choose">← 回到选择页</a>
+      <a class="outro__back mono" href="index.html#choose">回到主站</a>
     </div>
   </footer>
 
 <script src="assets/vendor/lenis.min.js"></script>
-  <script src="assets/js/ui.js"></script>
-<script src="assets/js/work.js"></script>
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/js/exhibition.js?v=1"></script>
+  <script src="assets/js/ui.js?v=nav-gradient-4"></script>
+<script src="assets/js/work.js?v=exhibition-1"></script>
 </body>
 </html>
 

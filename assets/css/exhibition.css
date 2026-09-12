@@ -1,0 +1,117 @@
+/* An open sheet, a project desk, and a quiet viewing room. */
+.fragments{ display:grid; grid-template-columns:.9fr 1.1fr; gap:6vw; padding-block:clamp(110px,17vh,190px); min-height:120svh; overflow:clip; background-image:none; }
+.fragments::before{ display:none; }
+.fragments__intro{ align-self:start; position:sticky; top:22vh; }
+.fragments__intro > .mono{ font-size:12px; }
+.fragments__intro h2{ font-size:clamp(54px,7.1vw,110px); margin:30px 0; line-height:.96; letter-spacing:-.06em; }
+.fragments__intro h2 span{ -webkit-text-stroke:1px var(--paper); color:transparent; }
+.fragments__desc{ font-size:16px; line-height:1.85; color:rgba(245,246,241,.72); }
+.fragments__hint{ margin-top:48px; opacity:.65; letter-spacing:.08em; }
+.fragments__wall{ display:grid; grid-template-columns:1fr 1fr; gap:56px 24px; align-items:start; padding:28px 10px 70px; }
+.fragment{ display:block; width:100%; background:var(--paper); color:var(--ink); padding:10px; text-align:left; transform:rotate(var(--turn)); transition:transform .3s; }
+.fragment:nth-child(even){ margin-top:72px; }
+.fragment:hover,.fragment:focus-visible{ transform:rotate(0) translateY(-8px); }
+.fragment__image{ display:block; width:100%; aspect-ratio:4/5; object-fit:cover; background:#dce3df; }
+.fragment:first-child .fragment__image{ object-fit:contain; }
+.fragment__caption{ display:flex; justify-content:space-between; gap:10px; padding:16px 2px 6px; font-size:11px; letter-spacing:.04em; }
+.fragment:focus-visible,.exhibit-action:focus-visible,.gallery-jump a:focus-visible,.art-viewer button:focus-visible{ outline:2px solid var(--green); outline-offset:6px; }
+.choose{ position:relative; z-index:2; }
+.choose .card{ border-radius:0; box-shadow:none; }
+.choose .card:hover{ box-shadow:none; transform:translateY(-6px); }
+
+/* Work has two modes: readable project studies, then spacious artwork. */
+.work-hero{ min-height:75svh; display:flex; align-items:flex-end; padding-bottom:80px; }
+.work-hero__bgtext{ top:16vh; opacity:.45; font-size:clamp(100px,23vw,360px); }
+.work-hero__title{ max-width:1000px; font-size:clamp(48px,7.8vw,118px); }
+.work-hero__sub{ font-size:12px; letter-spacing:.08em; line-height:1.8; }
+.gallery-jump{ display:flex; gap:32px; margin-top:32px; font-size:13px; }
+.gallery-jump a{ padding-bottom:8px; border-bottom:1px solid var(--green); }
+.project-studies{ display:grid; grid-template-columns:minmax(190px,.65fr) minmax(0,2fr); gap:5vw; padding:100px var(--space) 140px; }
+.project-studies .gallery__head{ display:block; position:sticky; top:120px; align-self:start; margin:0; }
+.project-studies .gallery__title{ font-size:clamp(36px,4vw,60px); line-height:1; margin:20px 0 30px; }
+.project-studies .gallery__progress{ display:none; }
+.project-studies .h-scroll{ overflow:visible; padding:0; user-select:auto; }
+.project-studies .h-scroll__inner{ display:grid; width:auto; gap:90px; padding:0; }
+.project-studies .p-card{ display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:28px; width:auto; border:0; border-top:1px solid var(--line-dark); border-radius:0; background:none; overflow:visible; padding-top:24px; box-shadow:none; }
+.project-studies .p-card:hover{ transform:none; box-shadow:none; }
+.project-studies .p-card__art{ align-self:start; overflow:hidden; }
+.project-studies .p-card__art svg{ aspect-ratio:1; object-fit:contain; background:var(--bg-2); transition:transform .6s; }
+.project-studies .p-card:hover .p-card__art svg{ transform:scale(1.04); }
+.project-studies .p-card__body{ padding:0; }
+.project-studies .p-card__title{ font-size:clamp(30px,3vw,46px); }
+.project-studies .p-card__desc{ font-size:15px; }
+.project-studies .p-card__tags span{ border:0; border-radius:0; padding:0; font-size:11px; }
+.project-studies .p-card__tags{ gap:12px; }
+.project-number{ font-size:12px; color:var(--green-200); margin-bottom:22px; }
+.exhibit-action{ display:inline-flex; align-items:center; justify-content:space-between; gap:32px; margin-top:28px; padding:12px 0; border-bottom:1px solid currentColor; font-size:13px; text-align:left; }
+.exhibit-action:hover{ color:var(--green); }
+.project-studies .gallery__foot{ grid-column:2; text-align:left; margin:0; font-size:12px; letter-spacing:.08em; }
+.painting-room{ padding:110px var(--space) 150px; background:var(--paper); color:var(--ink); }
+.painting-room .gallery__head{ max-width:none; margin-bottom:80px; padding-bottom:32px; border-bottom:1px solid var(--line); }
+.painting-room .gallery__title{ font-size:clamp(46px,7vw,110px); }
+.painting-room .gallery__progress{ font-size:12px; }
+.painting-room .gallery__progress i{ display:none; }
+.painting-room .h-scroll{ overflow:visible; user-select:auto; padding:0; }
+.painting-room .h-scroll__inner{ width:auto; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:100px 10vw; align-items:start; }
+.painting-room .d-card{ width:auto; min-width:0; margin:0; }
+.painting-room .d-card:nth-child(even){ padding-top:160px; }
+.painting-room .d-card__frame{ padding:0; box-shadow:none; border-radius:0; background:#e2e6e0; overflow:hidden; }
+.painting-room .d-card__frame svg{ width:100%; max-height:65svh; aspect-ratio:3/4; border-radius:0; transition:transform .7s; }
+.painting-room .d-card:hover .d-card__frame{ transform:none; box-shadow:none; }
+.painting-room .d-card:hover svg{ transform:scale(1.025); }
+.painting-room .d-card__cap{ display:flex; flex-wrap:wrap; gap:8px; color:rgba(10,13,12,.65); font-size:12px; line-height:1.6; letter-spacing:.04em; margin-top:20px; }
+.painting-room .d-card__cap span:first-child{ color:var(--ink); }
+.painting-room .exhibit-action{ margin-top:8px; }
+.painting-room .gallery__foot{ color:var(--ink); margin-top:90px; font-size:12px; letter-spacing:.08em; }
+.painting-room + *{ position:relative; }
+
+.viewer-open{ overflow:hidden; }
+.art-viewer{ width:min(1160px,94vw); max-width:none; max-height:94svh; padding:24px 32px; margin:auto; border:1px solid rgba(245,246,241,.22); color:var(--paper); background:var(--bg); overflow:auto; overscroll-behavior:contain; }
+.art-viewer::backdrop{ background:rgba(5,7,6,.94); }
+.art-viewer[open]{ animation:viewer-enter .22s ease-out; }
+.art-viewer,.art-viewer *{ cursor:auto !important; }
+.art-viewer button{ cursor:pointer !important; min-width:44px; min-height:44px; border:1px solid rgba(245,246,241,.3); padding:8px 14px; }
+.art-viewer button:disabled{ opacity:.25; cursor:default !important; }
+.art-viewer__toolbar{ display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+.art-viewer__media{ height:60svh; margin:20px 0; display:flex; justify-content:center; align-items:center; }
+.art-viewer__media > *{ width:100%; height:100%; object-fit:contain; }
+.art-viewer__media svg{ width:100%; height:100%; }
+.art-viewer__info{ display:flex; justify-content:space-between; gap:30px; align-items:center; }
+.art-viewer__info h2{ font-size:28px; }
+.art-viewer__description{ max-width:60ch; color:rgba(245,246,241,.72); font-size:14px; line-height:1.7; margin-top:8px; }
+.art-viewer__controls{ display:flex; gap:18px; align-items:center; white-space:nowrap; font-size:12px; }
+@keyframes viewer-enter{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+@media(max-width:900px){
+  .fragments{ grid-template-columns:1fr; gap:45px; }
+  .fragments__intro{ position:relative; top:auto; }
+  .fragments__intro h2{ font-size:clamp(60px,12vw,100px); }
+  .fragments__wall{ max-width:700px; width:100%; justify-self:center; }
+  .project-studies{ grid-template-columns:1fr; gap:50px; }
+  .project-studies .gallery__head{ position:relative; top:auto; }
+  .project-studies .gallery__foot{ grid-column:1; }
+  .painting-room .h-scroll__inner{ gap:64px 6vw; }
+  .painting-room .d-card:nth-child(even){ padding-top:90px; }
+}
+@media(max-width:560px){
+  .fragments{ padding-top:90px; padding-bottom:75px; }
+  .fragments__wall{ gap:30px 16px; padding-inline:0; }
+  .fragment{ padding:6px; }
+  .fragment:nth-child(even){ margin-top:40px; }
+  .fragment__caption{ font-size:10px; padding:12px 0 6px; }
+  .project-studies .p-card{ grid-template-columns:1fr; gap:24px; }
+  .project-studies .p-card__art svg{ aspect-ratio:16/10; }
+  .project-studies .h-scroll__inner{ gap:64px; }
+  .painting-room .gallery__head{ display:block; margin-bottom:48px; }
+  .painting-room .gallery__progress{ margin-top:24px; }
+  .painting-room .h-scroll__inner{ grid-template-columns:1fr; gap:64px; }
+  .painting-room .d-card:nth-child(even){ padding-top:0; }
+  .art-viewer{ padding:16px; }
+  .art-viewer__info{ flex-direction:column; align-items:stretch; gap:20px; }
+  .art-viewer__controls{ justify-content:space-between; }
+  .art-viewer__media{ height:49svh; }
+}
+@media(prefers-reduced-motion:reduce){
+  .fragment{ transform:none; }
+  .fragment:hover,.fragment:focus-visible{ transform:none; }
+  .art-viewer[open]{ animation:none; }
+}

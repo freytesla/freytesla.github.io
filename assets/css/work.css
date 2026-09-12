@@ -30,17 +30,16 @@ body{ background:var(--bg); color:var(--paper); }
 
 /* horizontal scroller */
 .h-scroll{
-  overflow-x:auto; overflow-y:hidden; cursor:grab;
+  overflow-x:auto; overflow-y:hidden; cursor:default;
   scrollbar-width:thin; scrollbar-color:var(--green-700) transparent;
+  overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch;
   padding:6px 0 22px;
-  
   user-select:none;
 }
 .h-scroll::-webkit-scrollbar{ height:5px; }
 .h-scroll::-webkit-scrollbar-track{ background:rgba(245,246,241,.06); border-radius:99px; }
 .h-scroll::-webkit-scrollbar-thumb{ background:var(--green-700); border-radius:99px; }
 .h-scroll::-webkit-scrollbar-thumb:hover{ background:var(--green); }
-.h-scroll:active{ cursor:grabbing; }
 .h-scroll__inner{ display:flex; gap:clamp(16px,2vw,28px); padding:0 var(--space); width:max-content; }
 
 /* project card */

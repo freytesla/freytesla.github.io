@@ -374,11 +374,17 @@ if ('IntersectionObserver' in window) {
 }
 
 /* ---------------- render loop ---------------- */
+/* turntable auto-spin (rad/s): keeps turning, only paused while dragging */
+const AUTO_SPIN = reduced ? 0.22 : 0.42;
+let lastFrameT = performance.now();
+
 function frame(now) {
   requestAnimationFrame(frame);
+  const dt = Math.min(0.05, Math.max(0, (now - lastFrameT) / 1000));
+  lastFrameT = now;
   if (!visible) return;
-  if (state.ready && !reduced && now - lastInteract > 2600) {
-    state.yaw += 0.0038;
+  if (state.ready && !dragging && now - lastInteract > 900) {
+    state.yaw += AUTO_SPIN * dt;
   }
   updateCamera();
   renderer.render(scene, camera);

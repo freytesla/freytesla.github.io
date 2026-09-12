@@ -405,33 +405,92 @@ class ImageTrailVariant7 {
 }
 
 function initPhotoWall() {
-  const trail = document.getElementById('photo-trail');
-  if (!trail) return;
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const pool = [
-    'assets/img/labradorite.png',
-    'data:image/svg+xml;utf8,' + encodeURIComponent(NECKLACE_GREEN),
-    artSVG(0), artSVG(1), artSVG(2), artSVG(3), artSVG(4), artSVG(5), artSVG(6), artSVG(7)
+  const wall = document.getElementById('photo-wall');
+  if (!wall) return;
+  const notes = [
+    ['assets/img/labradorite.png', '拉长石', 'Labradorite'],
+    [artSVG(0), '圆与方', '形状习作'],
+    [artSVG(1), '方向', '形状习作'],
+    [artSVG(2), '叠放', '形状习作'],
+    [artSVG(3), '留白', '形状习作'],
+    [artSVG(5), '边界', '形状习作']
   ];
-  pool.forEach(src => {
-    const el = document.createElement('div');
-    el.className = 'content__img';
-    const inner = document.createElement('div');
-    inner.className = 'content__img-inner';
-    inner.style.backgroundImage = 'url("' + src + '")';
-    el.appendChild(inner);
-    trail.appendChild(el);
+  const collection = [];
+  notes.forEach(([src, title, description], index) => {
+    const button = document.createElement('button');
+    button.type = 'button'; button.className = 'fragment';
+    button.style.setProperty('--turn', (index % 2 ? 3 : -3) + 'deg');
+    button.setAttribute('aria-label', '放大查看：' + title);
+    const img = document.createElement('img');
+    img.src = src; img.alt = title; img.className = 'fragment__image'; img.loading = 'lazy';
+    const caption = document.createElement('span');
+    caption.className = 'fragment__caption mono';
+    caption.innerHTML = '<span>' + title + '</span><span>' + String(index + 1).padStart(2, '0') + ' ↗</span>';
+    button.append(img, caption); wall.appendChild(button);
+    collection.push({ art: img, title, description });
+    button.addEventListener('click', () => window.FreyViewer?.open(collection, index, button));
   });
-
-  const variant = parseInt(trail.getAttribute('data-variant') || '7', 10);
-  const Cls = { 1: ImageTrailVariant1, 7: ImageTrailVariant7 }[variant] || ImageTrailVariant7;
-  new Cls(trail);
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+      wall.querySelectorAll('.fragment').forEach((card, i) => {
+        gsap.from(card, { y: 80 + i * 10, rotation: i % 2 ? 12 : -12, opacity: 0,
+          scrollTrigger: { trigger: card, start: 'top 105%', end: 'top 65%', scrub: 0.5 } });
+      });
+      gsap.from('#choose', { clipPath: 'inset(0 5% 0 5%)',
+        scrollTrigger: { trigger: '#choose', start: 'top bottom', end: 'top 30%', scrub: 0.4 } });
+    });
+  }
 }
 
 
 /* ============================================================
-   2.5) SLOGAN — FoldText (React Bits vanilla port)
+   2.5) SLOGAN — seamless marquee + FoldText (React Bits vanilla port)
+   ============================================================ */
+function initMarquee() {
+  const marquee = document.querySelector('.slogan__marquee');
+  const track = marquee && marquee.querySelector('.marquee__track');
+  const groups = track ? Array.from(track.querySelectorAll('.mq-group')) : [];
+  if (!track || !groups.length) return;
+
+  const template = groups[0];
+  groups.slice(1).forEach(group => group.remove());
+
+  let resizeFrame = null;
+
+  function fillTrack() {
+    const viewport = marquee.clientWidth;
+    const unitWidth = template.getBoundingClientRect().width;
+    if (!viewport || !unitWidth) return;
+
+    track.querySelectorAll('[data-marquee-clone]').forEach(clone => clone.remove());
+
+    /* Keep one full copy beyond the viewport so the reset point is never blank. */
+    const copies = Math.max(2, Math.ceil(viewport / unitWidth) + 2);
+    for (let i = 1; i < copies; i += 1) {
+      const clone = template.cloneNode(true);
+      clone.setAttribute('data-marquee-clone', '');
+      track.appendChild(clone);
+    }
+
+    track.style.setProperty('--marquee-shift', '-' + unitWidth + 'px');
+    track.style.animationDuration = Math.max(22, unitWidth / 28) + 's';
+  }
+
+  function scheduleFill() {
+    if (resizeFrame) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(function () {
+      resizeFrame = null;
+      fillTrack();
+    });
+  }
+
+  window.addEventListener('resize', scheduleFill, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleFill);
+  scheduleFill();
+}
+
+/* ============================================================
+   SLOGAN — FoldText (React Bits vanilla port)
    ============================================================ */
 function initFoldText() {
   const el = document.getElementById('slogan-fold');
@@ -440,7 +499,7 @@ function initFoldText() {
     text: 'Launch with clarity',
     splitBy: 'char',
     hinge: 'top',
-    trigger: 'scroll',
+    trigger: reduced ? 'mount' : 'manual',
     duration: 0.65,
     stagger: 0.045,
     ease: 'power3.out',
@@ -453,6 +512,61 @@ function initFoldText() {
   });
 }
 
+/* A faceted aperture links the necklace to the unfolding typography. */
+function initOpeningTransition() {
+  const opening = document.getElementById('opening');
+  if (!opening || !window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+    const hero = opening.querySelector('.hero');
+    const slogan = opening.querySelector('.slogan');
+    const pieces = slogan.querySelectorAll('.fold-text-piece');
+    const necklace = hero.querySelector('.hero__stage');
+    const necklaceNext = necklace && necklace.nextSibling;
+    // Keep the same live canvas and physics instance above both scenes.
+    // The shared sticky stage carries it away with the slogan at the end.
+    const labels = necklace ? [...necklace.querySelectorAll('.hero__stage-hint, .hero__stage-tag')] : [];
+    if (necklace) {
+      labels.forEach(label => hero.appendChild(label));
+      opening.querySelector('.opening__stage').appendChild(necklace);
+    }
+    opening.classList.add('opening--animated');
+    const timeline = gsap.timeline({
+      defaults: { ease: 'none' },
+      onUpdate: () => window.dispatchEvent(new Event('frey:scene-frame')),
+      scrollTrigger: {
+        trigger: opening,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+    timeline
+      .to(hero, { scale: 1.06, opacity: 0.3, duration: 0.65 }, 0.06)
+      .fromTo(slogan, { clipPath: 'polygon(50% 55%,50% 55%,50% 55%,50% 55%)' },
+        { clipPath: 'polygon(50% 37%,50.3% 55%,50% 73%,49.7% 55%)', duration: 0.14 }, 0.04)
+      .to(slogan, { clipPath: 'polygon(50% -65%,170% 55%,50% 175%,-70% 55%)', duration: 0.54, ease: 'power2.inOut' }, 0.18)
+      .fromTo(slogan.querySelector('.slogan__center'), { y: 48, scale: 0.94 }, { y: 0, scale: 1, duration: 0.4 }, 0.48)
+      .fromTo(pieces, { opacity: 0, rotateX: -85, '--fold-crease': 0.45 },
+        { opacity: 1, rotateX: 0, '--fold-crease': 0, stagger: 0.009, duration: 0.22, ease: 'power2.out' }, 0.48)
+      .fromTo(slogan.querySelector('.slogan__marquee'), { yPercent: -105, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.18 }, 0.68)
+      .fromTo(slogan.querySelector('.slogan__sub'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.16 }, 0.76)
+      .to({}, { duration: 0.12 });
+    if (necklace) {
+      timeline.fromTo(necklace, { opacity: 1 },
+        { opacity: 0.28, duration: 0.36, ease: 'power1.inOut' }, 0.35);
+    }
+    return () => {
+      opening.classList.remove('opening--animated');
+      if (necklace) {
+        hero.insertBefore(necklace, necklaceNext);
+        labels.forEach(label => necklace.appendChild(label));
+      }
+    };
+  });
+}
+
 /* ============================================================
    boot — 每一项独立 try/catch，任何一个失败不影响其它
    ============================================================ */
@@ -461,6 +575,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // initNecklace() 里注册 FreyBoot.add(gltfPromise, { weight: 3, progress: fn })
   // （用法见 assets/js/ui.js 顶部 FreyBoot 说明）
   // 项链已换成物理版（assets/js/necklace-physics.js，由 index.html 以 ESM 加载）
+  try { initMarquee(); } catch (e) { console.warn('Frey: marquee init failed', e); }
   try { initFoldText(); } catch (e) { console.warn('Frey: fold text init failed', e); }
+  try { initOpeningTransition(); } catch (e) { console.warn('Frey: opening transition init failed', e); }
   try { initPhotoWall(); } catch (e) { console.warn('Frey: photo wall init failed', e); }
 });
