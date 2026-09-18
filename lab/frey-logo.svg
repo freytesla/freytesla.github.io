@@ -1,0 +1,6 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96">
+  <text x="4" y="72" font-family="Syne, Arial, sans-serif" font-size="68" font-weight="800" fill="#050706" letter-spacing="-2">Frey</text>
+  <circle cx="212" cy="58" r="9" fill="#01847F"/>
+  <path d="M252 16c22 10 34 30 34 56" fill="none" stroke="#01847F" stroke-width="3"/>
+  <path d="M286 74 l10 10 -10 10 -10 -10z" fill="#01847F"/>
+</svg>
