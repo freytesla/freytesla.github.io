@@ -304,9 +304,10 @@
       var theme = themeAt(innerWidth / 2, 55);
       body.setAttribute('data-theme', theme);
       items.forEach(function (item) {
-        // The header gradient is a shared backdrop: text must match it,
-        // including while the page beneath is only partly revealed.
-        if (item.getAttribute('data-nav-theme') !== theme) item.setAttribute('data-nav-theme', theme);
+        var rect = item.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        var localTheme = themeAt(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        if (item.getAttribute('data-nav-theme') !== localTheme) item.setAttribute('data-nav-theme', localTheme);
       });
     }
     window.addEventListener('scroll', pick, { passive: true });
@@ -339,20 +340,10 @@
   /* ---------------- Page transition ---------------- */
   /* ---------------- Page transition ---------------- */
   function initTransitions() {
-    var supportsView = 'startViewTransition' in document;
-    document.addEventListener('click', function (e) {
-      var a = e.target.closest('a[href]');
-      if (!a) return;
-      var href = a.getAttribute('href');
-      if (!href || href.charAt(0) === '#' || href.indexOf('http') === 0 || a.target === '_blank' || a.hasAttribute('download')) return;
-      if (href === location.pathname.split('/').pop() || href === location.pathname) return;
-      e.preventDefault();
-      if (supportsView) {
-        document.startViewTransition(function () { location.href = href; });
-      } else {
-        document.documentElement.classList.add('is-leaving');
-        setTimeout(function () { location.href = href; }, 380);
-      }
+    // Cross-document transitions are opted into in choreography.css. Native
+    // navigation preserves Ctrl/Cmd-click, downloads, hash links and history.
+    window.addEventListener('pageshow', function () {
+      document.documentElement.classList.remove('is-leaving');
     });
   }
 

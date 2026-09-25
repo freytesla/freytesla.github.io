@@ -264,23 +264,28 @@ body{ transition:opacity .45s var(--ease), transform .45s var(--ease); }
 .site-head{
   position:fixed; top:0; left:0; right:0; z-index:900;
   display:flex; align-items:center; justify-content:space-between;
-  padding:clamp(14px,2.4vw,26px) var(--space);
+  padding:clamp(10px,1.4vw,18px) var(--space);
   pointer-events:none;
   color:var(--ink);
-  transition:color .4s, background .4s;
+  isolation:isolate;
+  transition:none;
 }
 body[data-theme="dark"] .site-head{ color:var(--paper); }
-/* dark sections: translucent bar so fixed nav never clashes with content behind it (e.g. slogan marquee) */
-body[data-theme="dark"] .site-head{
-  background:linear-gradient(180deg, rgba(5,7,6,.92) 0%, rgba(5,7,6,.66) 70%, rgba(5,7,6,0) 100%);
+/* A short, neutral glass strip samples the scene instead of painting over it. */
+.site-head::before{
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg,rgba(128,128,128,.055) 0%,rgba(128,128,128,.018) 52%,transparent 78%);
+  -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.55) 28%,rgba(0,0,0,.14) 55%,transparent 72%);
+  mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.55) 28%,rgba(0,0,0,.14) 55%,transparent 72%);
 }
-/* light sections: same translucent bar, paper-tinted so the nav stays readable on white */
-body[data-theme="paper"] .site-head{
-  background:linear-gradient(180deg, rgba(245,246,241,.92) 0%, rgba(245,246,241,.66) 70%, rgba(245,246,241,0) 100%);
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  body[data-theme="dark"] .site-head::before{ background:rgba(5,7,6,.8); }
+  body[data-theme="paper"] .site-head::before{ background:rgba(245,246,241,.8); }
 }
 body[data-theme="dark"] .site-head .logo svg rect{ opacity:.08; }
 .site-head > *{ pointer-events:auto; }
-/* Keep the original separation gradient; update its theme without a lag. */
+/* Text follows the local scene; the neutral glass never needs a color switch. */
 body .site-head.site-head--adaptive{ transition:none; }
 body:not(.menu-open) .site-head--adaptive [data-nav-theme="paper"]{ color:var(--ink); }
 body:not(.menu-open) .site-head--adaptive [data-nav-theme="dark"]{ color:var(--paper); }
@@ -476,7 +481,7 @@ body[data-theme="dark"] .corner-label{ color:var(--muted-paper); }
 .site-foot__watermark{
   position:absolute; left:50%; bottom:-6%; transform:translateX(-50%);
   font-family:var(--font-display); font-weight:800; font-size:clamp(120px,26vw,420px); letter-spacing:-.04em;
-  color:transparent; -webkit-text-stroke:1px rgba(245,246,241,.08); pointer-events:none; white-space:nowrap;
+  color:transparent; -webkit-text-stroke:1.6px rgba(245,246,241,.1); pointer-events:none; white-space:nowrap;
   user-select:none;
   -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 16%, #000 84%, rgba(0,0,0,0) 100%);
   mask-image:linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 16%, #000 84%, rgba(0,0,0,0) 100%);

@@ -14,10 +14,12 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"></noscript>
-<link rel="stylesheet" href="assets/css/base.css?v=nav-gradient-4">
-<link rel="stylesheet" href="assets/css/home.css">
-<link rel="stylesheet" href="assets/css/exhibition.css?v=1">
+<link rel="stylesheet" href="assets/css/base.css?v=nav-glass-8">
+<link rel="stylesheet" href="assets/css/home.css?v=opening-2">
+<link rel="stylesheet" href="assets/css/exhibition.css?v=3">
+<link rel="stylesheet" href="assets/css/choreography.css?v=2">
 <link rel="stylesheet" href="assets/css/FoldText.css">
+  <link rel="stylesheet" href="assets/css/flow.css?v=8">
 <script type="importmap">
 { "imports": { "three": "./assets/vendor/three.module.js" } }
 </script>
@@ -77,30 +79,20 @@
     <div class="opening" id="opening">
     <div class="opening__stage">
     <section id="hero" class="hero section section--flush" data-theme="paper">
-      <div class="hero__bgtext display" aria-hidden="true">FREY</div>
-
-      <div class="hero__meta hero__meta--tl">
-        <span class="mono">Frey / 芙蕾</span>
-        <span class="mono dim">personal universe 001</span>
-      </div>
-      <div class="hero__meta hero__meta--tr">
-        <span class="mono dim">code ✦ art ✦ life</span>
-        <span class="mono">est. 2026</span>
-      </div>
+      <h1 class="hero__bgtext display" aria-label="Frey">FREY</h1>
 
       <div id="necklace" class="hero__stage" data-hover aria-label="拉长石项链，可拖动旋转">
         <canvas id="necklace-canvas"></canvas>
-        <div class="hero__stage-hint mono" data-reveal>拉长石 · Labradorite — 按住拖动它</div>
-        <div class="hero__stage-tag mono">iridescence 0.184</div>
+        <div class="hero__stage-hint mono">拉长石 · Labradorite — 按住拖动它</div>
       </div>
 
-      <div class="hero__intro" data-reveal data-reveal="left">
-        <p class="mono green">// hello, I'm</p>
-        <h1 class="hero__name display">Frey<span class="green">.</span></h1>
-        <p class="hero__desc">Coder · Creater · Explorer<br>欢迎来到我的个人主页哦！</p>
+      <div class="hero__intro" data-reveal>
+        <p class="mono green">CODE / ART / LIFE</p>
+        <p class="hero__desc">用代码构建，用好奇心探索。</p>
+        <p class="hero__roles">Coder · Creator · Explorer</p>
       </div>
 
-      <div class="scroll-hint"><span>scroll</span><span class="line"></span></div>
+      <p class="hero__signature mono">A PERSONAL UNIVERSE</p>
     </section>
 
     <!-- ============================================================
@@ -159,7 +151,7 @@
         <header class="sec-head" data-reveal>
           <div>
             <p class="sec-head__num">03 — CHOOSE YOUR PATH</p>
-            <h2 class="sec-head__title">选择你的入口<span class="green">.</span></h2>
+            <h2 class="sec-head__title">选择你的<br>下一站<span class="green">.</span></h2>
           </div>
           <p class="sec-head__sub">每条路都是我的一个切面。<br>你从哪一扇门进来？</p>
         </header>
@@ -200,7 +192,7 @@
       <div class="wrap ask-inner">
         <div class="ask-left" data-reveal="left">
 <p class="mono green">04 — ASK / 提问箱</p>
-      <h2 class="ask-title display">想对我说点什么<span class="green">?</span></h2>
+      <h2 class="ask-title display">想对我<br>说点什么<span class="green">?</span></h2>
       <p class="ask-sub">问题、建议、悄悄话，或者只是打声招呼。<br>全部匿名 · 会认真读。</p>
 
       <div class="ask-chips" aria-label="示例问题">
@@ -300,31 +292,31 @@
 <script src="assets/vendor/ScrollTrigger.min.js"></script>
 <script src="assets/js/FoldText.js"></script>
 <script src="assets/js/exhibition.js?v=1"></script>
-<script src="assets/js/home.js?v=exhibition-1"></script>
+<script src="assets/js/home.js?v=exhibition-2"></script>
 <script src="assets/vendor/lenis.min.js"></script>
-  <script src="assets/js/ui.js?v=nav-gradient-4"></script>
+  <script src="assets/js/ui.js?v=choreography-1"></script>
+  <script src="assets/js/choreography.js?v=7"></script>
 <script src="assets/js/ask.js"></script>
 <script>
   /* 物理项链：透明背景、无粒子/阴影，舞台铺满 hero */
   window.FREY_NECKLACE_OPTIONS = {
     stageId: 'necklace', canvasId: 'necklace-canvas',
     sparkles: false, shadow: false, hud: false, bright: false, lightBg: true,
-    fitW: 5.2, fitH: 3.5, centerY: -1.4,
-    gravity: 16,          // 重力 g（演示页的滑块不受影响）
-    /* 吊坠物理参数（都可调）：
-       sway          回正力度（越大摆得越快）
-       damping       摆动阻尼（越大越快停）
-       inertia       惯性：拖链子时吊坠滞后/甩动幅度
-       twistSpring   绕竖轴扭转回正（越小越容易转）
-       twistDamping  扭转阻尼
-       maxOmega      角速度上限（防止疯转） */
-    pendulum: { sway: 17.0, damping: 3.5, inertia: 1.15, twistSpring: 1.2, twistDamping: 1.0, maxOmega: 20,
-                frontBack: 0.10, spin: 0.06, motionFreq: 0.85,
-                reversalBoost: 13.0, revDecay: 5.0,
-                maxTiltDeg: 120, maxYawDeg: 45, yawRestitution: 0.35 }
+    fitW: 3.0, fitH: 2.6, centerY: -1.5,
+    gravity: 9.8,         // 重力 g（调低后吊坠更轻、更容易抬起）
+    /* 新物理：石头/扣子的质量、链扣双向约束、拖动弹簧与软角度限制 */
+    pendulum: {
+      stoneMass: 3.6, bailMass: 1.0, chainPointMass: 1.0,
+      dragSpring: 420, dragDamping: 32, maxDragAccel: 220, dragBailShare: 1.0, pendantDrop: 0.08, stoneLift: 0.05,
+      airDamping: 1.2, bailDamping: 2.2,
+      contactStiffness: 0.82, rodStiffness: 1.0, solverIterations: 10,
+      twistSpring: 5.5, twistDamping: 2.2, spin: 0.08, motionFreq: 0.55,
+      maxYawDeg: 45, yawSoftness: 0.22,
+      maxTiltDeg: 120, tiltSoftness: 0.35
+    }
   };
 </script>
-<script type="module" src="assets/js/necklace-physics.js"></script>
+<script type="module" src="assets/js/necklace-physics.js?v=2"></script>
 <script>
   /* 用 file:// 直接双击时 ES Module 会被拦截 → 用静态项链图兜底 */
   if (location.protocol === 'file:') {
@@ -341,8 +333,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-

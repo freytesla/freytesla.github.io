@@ -1,9 +1,9 @@
 /* An open sheet, a project desk, and a quiet viewing room. */
-.fragments{ display:grid; grid-template-columns:.9fr 1.1fr; gap:6vw; padding-block:clamp(110px,17vh,190px); min-height:120svh; overflow:clip; background-image:none; }
+.fragments{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:5vw; padding-block:clamp(110px,17vh,190px); min-height:120svh; overflow:clip; background-image:none; }
 .fragments::before{ display:none; }
 .fragments__intro{ align-self:start; position:sticky; top:22vh; }
 .fragments__intro > .mono{ font-size:12px; }
-.fragments__intro h2{ font-size:clamp(54px,7.1vw,110px); margin:30px 0; line-height:.96; letter-spacing:-.06em; }
+.fragments__intro h2{ font-size:clamp(48px,4.5vw,76px); margin:30px 0; line-height:.96; letter-spacing:-.06em; }
 .fragments__intro h2 span{ -webkit-text-stroke:1px var(--paper); color:transparent; }
 .fragments__desc{ font-size:16px; line-height:1.85; color:rgba(245,246,241,.72); }
 .fragments__hint{ margin-top:48px; opacity:.65; letter-spacing:.08em; }
@@ -82,10 +82,10 @@
 .art-viewer__controls{ display:flex; gap:18px; align-items:center; white-space:nowrap; font-size:12px; }
 @keyframes viewer-enter{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
 @media(max-width:900px){
-  .fragments{ grid-template-columns:1fr; gap:45px; }
+  .fragments{ grid-template-columns:minmax(0,1fr); gap:45px; }
   .fragments__intro{ position:relative; top:auto; }
-  .fragments__intro h2{ font-size:clamp(60px,12vw,100px); }
-  .fragments__wall{ max-width:700px; width:100%; justify-self:center; }
+  .fragments__intro h2{ font-size:clamp(40px,8vw,72px); }
+  .fragments__wall{ max-width:700px; width:100%; min-width:0; justify-self:center; }
   .project-studies{ grid-template-columns:1fr; gap:50px; }
   .project-studies .gallery__head{ position:relative; top:auto; }
   .project-studies .gallery__foot{ grid-column:1; }

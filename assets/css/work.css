@@ -75,6 +75,3 @@ body{ background:var(--bg); color:var(--paper); }
 .d-card__cap{ display:flex; justify-content:space-between; margin-top:12px; font-size:var(--fs-micro); letter-spacing:.18em; color:var(--muted-paper); }
 .d-card__cap span:first-child{ color:var(--paper); }
 
-/* work hero title: Archivo Black (similar bold display, different from Syne) */
-.work-hero__title{ font-family:'Bricolage Grotesque','Noto Sans SC',sans-serif; font-weight:800; letter-spacing:-.01em; }
-

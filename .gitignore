@@ -1,3 +1,7 @@
 .originkit/
 output/gltf-opt/
 
+
+.playwright-cli/
+debug.log
+output/playwright/

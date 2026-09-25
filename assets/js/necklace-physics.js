@@ -3,8 +3,8 @@
    ------------------------------------------------------------
    · 链子：64 个 Verlet 质点 + 距离约束（两端挂在展示架上），细银绳蛇骨链
      重力让整条链自然下垂、回弹、摆动（猫垂线）
-   · 吊坠：挂在链最低点（中点），随链切线方向自然摆动
-   · 交互：按住链子/吊坠拖动 → 松手重力回弹、可甩动
+   · 吊坠：扣子可沿链滑动，石头通过真实杆约束与链子双向作用
+   · 交互：按住石头拖动 → 石头、扣子、链子在同一物理子步内共同响应
    · 模型：自动尝试加载 assets/models/necklace.glb 或 pendant.glb
      （Blender 导出，见 NECKLACE-PHYSICS.md）；找不到就用程序化吊坠兜底
    · 本页使用 ES Module，需本地服务器或 GitHub Pages 打开：
@@ -14,17 +14,22 @@ import * as THREE from 'three';
 import { GLTFLoader } from '../vendor/jsm/loaders/GLTFLoader.js';
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const OPT = Object.assign({
-  stageId: 'stage', canvasId: 'stage-canvas',
   sparkles: true, shadow: true, hud: true, bright: false, lightBg: false,
   fitW: 4.2, fitH: 3.6, centerY: -0.45, gravity: null,
   // 吊坠摆动参数（三维球面摆 + 绕竖轴扭转）
   pendulum: null
 }, window.FREY_NECKLACE_OPTIONS || {});
-// 吊坠物理参数：sway 回正力度 / damping 摆动阻尼 / inertia 惯性(拖动滞后) /
-// twistSpring+twistDamping 绕竖轴扭转 / maxOmega 角速度上限
-const PEND = Object.assign({ sway: 11.0, damping: 2.0, inertia: 0.9, twistSpring: 1.2, twistDamping: 1.0, maxOmega: 12, yawRestitution: 0.35,
-  frontBack: 1.4, spin: 0.9, motionFreq: 1.85 },   // 前后摆动量 / 左右转动量 / 频率
-  OPT.pendulum || {});
+// 新模型：石头是有质量的摆体；扣子是可沿链滑动的接触点；链子与吊坠双向约束
+const PEND = Object.assign({
+  stoneMass: 3.6, bailMass: 1.0, chainPointMass: 1.0,
+  dragSpring: 420, dragDamping: 32, maxDragAccel: 220, dragBailShare: 1.0, pendantDrop: 0.08, stoneLift: 0.05,
+  airDamping: 1.2, bailDamping: 2.2,
+  contactStiffness: 0.82, rodStiffness: 1.0, solverIterations: 10,
+  twistSpring: 5.5, twistDamping: 2.2,
+  spin: 0.08, motionFreq: 0.55,
+  maxYawDeg: 45, yawSoftness: 0.22,
+  maxTiltDeg: 120, tiltSoftness: 0.35
+}, OPT.pendulum || {});
 const wrap = document.getElementById(OPT.stageId) || document.getElementById('stage');
 const canvas = document.getElementById(OPT.canvasId) || document.getElementById('stage-canvas');
 /* ---------------- helpers ---------------- */
@@ -55,6 +60,7 @@ class VerletRope {
     this.gravity = 9.8;
     this.damping = 0.995;          // 每帧速度保留率
     this.iterations = 8;           // 约束迭代次数（越大越“硬”）
+    this.maxSpeed = 40;             // 单质点速度上限
     this.wind = { x: 0, z: 0 };
     this.anchorA = { x: -1.55, y: 1.15, z: 0 };
     this.anchorB = { x: 1.55, y: 1.15, z: 0 };
@@ -89,9 +95,9 @@ class VerletRope {
   settle(steps) {
     for (let i = 0; i < steps; i++) this.step(1 / 60);
   }
-  solve() {
+  solve(iterations = this.iterations) {
     const pts = this.points, L = this.segLen;
-    for (let k = 0; k < this.iterations; k++) {
+    for (let k = 0; k < iterations; k++) {
       for (let i = 0; i < this.n - 1; i++) {
         const a = pts[i], b = pts[i + 1];
         if (a.pinned && b.pinned) continue;
@@ -105,7 +111,7 @@ class VerletRope {
       }
     }
   }
-  step(dt) {
+  integrate(dt) {
     const dt2 = dt * dt;
     const damp = Math.pow(this.damping, dt * 60);
     const pts = this.points;
@@ -123,20 +129,28 @@ class VerletRope {
     if (this.grabbed >= 0) {
       const p = pts[this.grabbed];
       p.x = this.grabTarget.x; p.y = this.grabTarget.y; p.z = this.grabTarget.z;
-      p.px = p.x - this.grabVel.x * dt;   // 把指针速度写回 → 松手可甩
+      p.px = p.x - this.grabVel.x * dt;
       p.py = p.y - this.grabVel.y * dt;
       p.pz = p.z - this.grabVel.z * dt;
     }
-    this.solve();
-    // 速度上限，防止极端拖拽把链拉爆
-    const MAXV = 40;
+  }
+  finalize(dt) {
+    const pts = this.points;
     for (let i = 0; i < this.n; i++) {
       const p = pts[i];
       if (p.pinned) continue;
       let vx = p.x - p.px, vy = p.y - p.py, vz = p.z - p.pz;
       const v = Math.sqrt(vx * vx + vy * vy + vz * vz) / dt;
-      if (v > MAXV) { const s = MAXV / v; p.px = p.x - vx * s; p.py = p.y - vy * s; p.pz = p.z - vz * s; }
+      if (v > this.maxSpeed) {
+        const k = this.maxSpeed / v;
+        p.px = p.x - vx * k; p.py = p.y - vy * k; p.pz = p.z - vz * k;
+      }
     }
+  }
+  step(dt) {
+    this.integrate(dt);
+    this.solve();
+    this.finalize(dt);
   }
   // 最近的未固定质点（屏幕坐标，像素）
   nearestToScreen(px, py, camera, w, h, maxPx) {
@@ -298,10 +312,6 @@ async function init() {
   const mid = Math.floor(N / 2);
   /* ---- 滑动扣子：吊坠可沿链子左右滑动（不扣死），带一点摩擦 ---- */
   const bead = { u: 0.5, v: 0 };          // u: 沿链子的位置(0~1)，v: 滑动速度
-  let slideGrab = false, slideTargetU = null;
-  const SLIDE_FRICTION = 7.5;             // 动摩擦（减速度 m/s²，越大越快停）
-  const SLIDE_STATIC = 0.09;              // 静摩擦阈值（链子很平时停住，防抖）
-  const SLIDE_VMAX = 9.0;                 // 滑动速度上限（越大摆动越快）
   const SAMPLE = { x: 0, y: 0, z: 0, tx: 1, ty: 0, tz: 0, L: 1 };  // 采样结果
   const segLens = new Float32Array(N - 1);
   // 沿链子按弧长比例 u 采样：返回链上位置 + 切线方向（t̂ 指向 +u）
@@ -356,7 +366,7 @@ async function init() {
   content.add(pendantAnchor);
   /* ---- 吊坠：先试 Blender 导出的模型，失败用程序化兜底 ---- */
   const PENDANT_H = 0.62;             // 吊坠期望高度（世界单位）
-  const PENDANT_GAP = 0.02;           // 吊坠(扣环中心/顶部)到链的间隙
+  const PENDANT_DROP = PEND.pendantDrop; // 链子接触点相对扣环中心上移，使吊坠整体下垂
   const parts = [];
   let pendantKind = '程序化吊坠';
   try {
@@ -378,17 +388,180 @@ async function init() {
     normalizePendant(pendant, PENDANT_H);
   }
   pendantAnchor.add(pendant);
-  window.__phys = { scene, camera, pendantAnchor, pendant }; // 调试钩子（可删）
-  window.__phys.pend = pend;
-  /* 石头中心（悬停/识别基准点用）：锚点 + 局部偏移，旋转/缩放后转到世界 */
+  const LOCAL_DOWN = new THREE.Vector3(0, -1, 0);
+  const body = {
+    bail: new THREE.Vector3(), stone: new THREE.Vector3(),
+    prevBail: new THREE.Vector3(), prevStone: new THREE.Vector3(),
+    bailVel: new THREE.Vector3(), stoneVel: new THREE.Vector3(),
+    bailLocal: new THREE.Vector3(0, -0.09, 0), comLocal: new THREE.Vector3(0, -0.44, 0), rodLocal: new THREE.Vector3(0, -1, 0),
+    q: new THREE.Quaternion(), qBase: new THREE.Quaternion(), qYaw: new THREE.Quaternion(),
+    yaw: 0, yawVel: 0, arm: 0.35, initialized: false,
+    invMassBail: 1 / PEND.bailMass, invMassStone: 1 / PEND.stoneMass
+  };
+  // 从真实模型量出扣环中心与石头质心，避免写死位置
+  pendant.updateMatrixWorld(true);
+  let bailObj = null; const stoneMeshes = [];
+  pendant.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.userData.role === 'bail') bailObj = o;
+    if (o.userData.role === 'stone') stoneMeshes.push(o);
+  });
+  if (bailObj) {
+    const bw = bailObj.getWorldPosition(new THREE.Vector3());
+    body.bailLocal.copy(pendant.worldToLocal(bw));
+    body.bailLocal.y += PENDANT_DROP;
+  }
+  const grabbable = stoneMeshes.length ? stoneMeshes : pendant.children;
+  if (stoneMeshes.length) {
+    const box = new THREE.Box3(); stoneMeshes.forEach((m) => box.expandByObject(m));
+    const cw = box.getCenter(new THREE.Vector3());
+    body.comLocal.copy(pendant.worldToLocal(cw));
+  }
+  body.rodLocal.subVectors(body.comLocal, body.bailLocal);
+  body.arm = Math.max(0.12, body.rodLocal.length());
+  body.rodLocal.multiplyScalar(1 / body.arm);
+  const ropeHit = { point: new THREE.Vector3(), tangent: new THREE.Vector3(), index: 0, t: 0 };
+  const ab = new THREE.Vector3(), ap = new THREE.Vector3(), closest = new THREE.Vector3(), err = new THREE.Vector3(), dir = new THREE.Vector3();
+  const tiltDir = new THREE.Vector3(), tiltPerp = new THREE.Vector3();
+  function closestOnRope(point, out) {
+    const pts = rope.points; let best = Infinity; out.index = 1; out.t = 0.5;
+    for (let i = 0; i < N - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      ab.set(b.x - a.x, b.y - a.y, b.z - a.z);
+      const len2 = ab.lengthSq() || 1e-10;
+      ap.set(point.x - a.x, point.y - a.y, point.z - a.z);
+      const t = clamp(ap.dot(ab) / len2, 0, 1);
+      closest.set(a.x + ab.x * t, a.y + ab.y * t, a.z + ab.z * t);
+      const d2 = closest.distanceToSquared(point);
+      if (d2 < best) { best = d2; out.index = i; out.t = t; out.point.copy(closest); }
+    }
+    const a = pts[out.index], b = pts[out.index + 1];
+    out.tangent.set(b.x - a.x, b.y - a.y, b.z - a.z);
+    if (out.tangent.lengthSq() < 1e-10) out.tangent.set(1, 0, 0); else out.tangent.normalize();
+    return out;
+  }
+  function initBody() {
+    if (body.initialized) return;
+    sampleRope(bead.u, SAMPLE);
+    body.bail.set(SAMPLE.x, SAMPLE.y, SAMPLE.z);
+    body.q.identity();
+    body.stone.copy(body.bail).addScaledVector(body.rodLocal, body.arm);
+    body.prevBail.copy(body.bail); body.prevStone.copy(body.stone);
+    body.bailVel.set(0, 0, 0); body.stoneVel.set(0, 0, 0);
+    body.yaw = 0; body.yawVel = 0; body.initialized = true;
+    applyBodyVisual();
+  }
+  function integrateBody(dt, t) {
+    body.prevBail.copy(body.bail); body.prevStone.copy(body.stone);
+    if (stoneDrag) {
+      dir.subVectors(stoneTarget, body.stone).multiplyScalar(PEND.dragSpring);
+      dir.addScaledVector(body.stoneVel, -PEND.dragDamping);
+      if (dir.lengthSq() > PEND.maxDragAccel * PEND.maxDragAccel) dir.setLength(PEND.maxDragAccel);
+      body.stoneVel.addScaledVector(dir, dt);
+      // 抓石头时，手的力通过刚性石体也直接传到扣子，避免只绕扣子旋转
+      body.bailVel.addScaledVector(dir, dt * PEND.dragBailShare);
+    }
+    body.bailVel.y -= rope.gravity * dt;
+    body.stoneVel.y -= rope.gravity * dt;
+    body.bailVel.multiplyScalar(Math.exp(-PEND.bailDamping * dt));
+    body.stoneVel.multiplyScalar(Math.exp(-PEND.airDamping * dt));
+    body.bail.addScaledVector(body.bailVel, dt);
+    body.stone.addScaledVector(body.stoneVel, dt);
+    const drive = Math.sin(t * PEND.motionFreq) * PEND.spin;
+    let yawAcc = -PEND.twistSpring * body.yaw - PEND.twistDamping * body.yawVel + drive;
+    const maxYaw = PEND.maxYawDeg * Math.PI / 180;
+    const over = Math.abs(body.yaw) - maxYaw;
+    if (over > 0) yawAcc -= Math.sign(body.yaw) * over * PEND.yawSoftness * 100;
+    body.yawVel += yawAcc * dt;
+    body.yaw += body.yawVel * dt;
+  }
+  function solveBailOnChain() {
+    closestOnRope(body.bail, ropeHit);
+    err.subVectors(ropeHit.point, body.bail);
+    const a = rope.points[ropeHit.index], b = rope.points[ropeHit.index + 1];
+    const invChain = 1 / PEND.chainPointMass;
+    const w0 = a.pinned ? 0 : invChain * (1 - ropeHit.t) * (1 - ropeHit.t);
+    const w1 = b.pinned ? 0 : invChain * ropeHit.t * ropeHit.t;
+    const denom = body.invMassBail + w0 + w1;
+    if (denom < 1e-10) return;
+    const k = PEND.contactStiffness / denom;
+    body.bail.addScaledVector(err, body.invMassBail * k);
+    if (!a.pinned) { a.x -= err.x * w0 * k; a.y -= err.y * w0 * k; a.z -= err.z * w0 * k; }
+    if (!b.pinned) { b.x -= err.x * w1 * k; b.y -= err.y * w1 * k; b.z -= err.z * w1 * k; }
+    bead.u = clamp((ropeHit.index + ropeHit.t) / (N - 1), 0.02, 0.98);
+  }
+  function solvePendantRod() {
+    dir.subVectors(body.stone, body.bail);
+    const len = dir.length();
+    if (len < 1e-6) { dir.copy(body.rodLocal); } else { dir.multiplyScalar(1 / len); }
+    const denom = body.invMassBail + body.invMassStone;
+    if (denom < 1e-10) return;
+    const k = (len - body.arm) * PEND.rodStiffness / denom;
+    body.bail.addScaledVector(dir, body.invMassBail * k);
+    body.stone.addScaledVector(dir, -body.invMassStone * k);
+  }
+  function solveTiltLimit() {
+    dir.subVectors(body.stone, body.bail);
+    if (dir.lengthSq() < 1e-10) return;
+    dir.normalize();
+    const cosTilt = clamp(dir.dot(LOCAL_DOWN), -1, 1);
+    const maxTilt = PEND.maxTiltDeg * Math.PI / 180;
+    const cosMax = Math.cos(maxTilt);
+    if (cosTilt >= cosMax) return;
+    const sinTilt = Math.sqrt(Math.max(0, 1 - cosTilt * cosTilt));
+    tiltDir.copy(LOCAL_DOWN).multiplyScalar(cosMax);
+    tiltPerp.copy(dir).addScaledVector(LOCAL_DOWN, -cosTilt);
+    if (tiltPerp.lengthSq() > 1e-10 && sinTilt > 1e-5) {
+      tiltDir.addScaledVector(tiltPerp, Math.sin(maxTilt) / sinTilt).normalize();
+    }
+    err.subVectors(tiltDir, dir).multiplyScalar(body.arm * PEND.tiltSoftness);
+    body.stone.add(err);
+  }
+  function finalizeBody(dt) {
+    body.bailVel.subVectors(body.bail, body.prevBail).multiplyScalar(1 / dt);
+    body.stoneVel.subVectors(body.stone, body.prevStone).multiplyScalar(1 / dt);
+  }
+  function applyBodyVisual() {
+    dir.subVectors(body.stone, body.bail);
+    if (dir.lengthSq() < 1e-10) dir.copy(LOCAL_DOWN); else dir.normalize();
+    body.qBase.setFromUnitVectors(LOCAL_DOWN, dir);
+    body.qYaw.setFromAxisAngle(dir, body.yaw);
+    body.q.multiplyQuaternions(body.qYaw, body.qBase).normalize();
+    closestOnRope(body.bail, ropeHit);
+    const visualOffset = ab.copy(body.bailLocal).applyQuaternion(body.q);
+    pendantAnchor.quaternion.copy(body.q);
+    pendantAnchor.position.copy(body.bail).sub(visualOffset);
+  }
+  function resetBody() {
+    body.initialized = false;
+    body.yaw = 0; body.yawVel = 0;
+    body.bailVel.set(0, 0, 0); body.stoneVel.set(0, 0, 0);
+    initBody();
+  }
+  function stepCoupled(dt, t) {
+    initBody();
+    const previousU = bead.u;
+    rope.integrate(dt);
+    integrateBody(dt, t);
+    for (let k = 0; k < PEND.solverIterations; k++) {
+      rope.solve(1);
+      solveBailOnChain();
+      solvePendantRod();
+      solveTiltLimit();
+    }
+    rope.finalize(dt);
+    finalizeBody(dt);
+    applyBodyVisual();
+    bead.v = (bead.u - previousU) / dt;
+  }
   const STONE_C = new THREE.Vector3(0, -0.436, -0.015);
   const stoneWv = new THREE.Vector3();
   function stoneCenterWorld(out) {
-    pendantAnchor.getWorldPosition(stoneWv);
-    out.copy(STONE_C).applyQuaternion(pendantAnchor.quaternion).multiplyScalar(content.scale.x).add(stoneWv);
-    return out;
+    out.copy(body.stone); content.localToWorld(out); return out;
   }
-  pendantAnchor.position.set(0, 0.65, 0); // 初始位置，首帧前防跳变
+  window.__phys = { scene, camera, pendantAnchor, pendant, body };
+  window.__phys.stepCoupled = stepCoupled;
+  window.__phys.resetBody = resetBody;
   setModelBadge('模型：' + pendantKind);
   /* ---- 氛围：星尘 + 地面柔影（可用 OPT 关闭）---- */
   let sparkles = null, spkMat = null;
@@ -477,20 +650,17 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
   const grabAt = (e) => {
     setPointer(e);
     raycaster.setFromCamera(ndc, camera);
-    const hits = raycaster.intersectObjects(pendant.children, true);
+    const hits = raycaster.intersectObjects(grabbable, true);
     // 只能抓石头/扣子本体（不再能抓链子）
     if (!(hits.length > 0 && hits[0].distance < 9)) return;
     stoneDrag = true;
     bead.v = 0;
-    const aw = new THREE.Vector3();
-    pendantAnchor.getWorldPosition(aw);
-    dragDepth = aw.z;                 // 记住抓取深度，滚轮可前后改
-    // 记录抓取点到石头锚点的偏移（在深度平面上算），拖动过程不跳
+    dragDepth = body.stone.z;         // 抓住石头质心所在深度
+    // 记录指针抓取点到石头质心的偏移，拖动过程不跳
     plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, dragDepth));
-    if (raycaster.ray.intersectPlane(plane, stoneOffset)) stoneOffset.subVectors(aw, stoneOffset);
+    if (raycaster.ray.intersectPlane(plane, stoneOffset)) stoneOffset.subVectors(body.stone, stoneOffset);
     else stoneOffset.set(0, 0, 0);
-    stoneTarget.copy(aw);
-    stoneFreezeQuat.copy(pendantAnchor.quaternion);   // 记住刚抓住时的朝向
+    stoneTarget.copy(body.stone);
     grabbed = true;
     idleSince = performance.now();
     rope.wind.x = 0; rope.wind.z = 0;
@@ -524,8 +694,6 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     if (!grabbed) return;
     grabbed = false;
     stoneDrag = false;
-    slideGrab = false;
-    slideTargetU = null;
     rope.grabbed = -1;
     rope.grabVel.set(0, 0, 0);
     idleSince = performance.now();
@@ -546,7 +714,7 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     });
   }
   if (resetBtn) {
-    resetBtn.addEventListener('click', () => { rope.reset(); bead.u = 0.5; bead.v = 0; slideTargetU = null; });
+    resetBtn.addEventListener('click', () => { rope.reset(); bead.u = 0.5; bead.v = 0; resetBody(); });
   }
   /* ---- resize：相机距离自适应，让项链尽量占满可视区域 ---- */
   const resize = () => {
@@ -583,20 +751,14 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     const t = clock.getElapsedTime();
     // 微风已去掉：静止时链子不动，只有拖动/链子物理会带动它
     rope.wind.x = 0; rope.wind.z = 0;
-    // 物理子步：固定步长 1/60，最多 2 步
+    // 固定子步：链子、扣子和石头在每一步里共同求解
     let remaining = dt;
     while (remaining > 1e-6) {
       const h = Math.min(PHYS_DT, remaining);
-      rope.step(h);
+      stepCoupled(h, t);
       remaining -= h;
     }
-    // 石头被抓住拖动时：链子自适应——把离石头最近的链点拉到石头处
-    if (stoneDrag) {
-      const si = rope.nearestIndexToPoint(stoneTarget.x, stoneTarget.y, stoneTarget.z);
-      const sp = rope.points[si];
-      sp.x = stoneTarget.x; sp.y = stoneTarget.y; sp.z = stoneTarget.z;
-      bead.u = clamp(si / (N - 1), 0.02, 0.98);   // 挂点跟着石头
-    }
+    sampleRope(bead.u, SAMPLE);
     /* ---- 蛇骨链摆放：细圆柱沿绳段 + 节点小球 ---- */
     const pts = rope.points;
     for (let i = 0; i < N - 1; i++) {
@@ -620,142 +782,6 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     }
     snake.instanceMatrix.needsUpdate = true;
     joints.instanceMatrix.needsUpdate = true;
-    /* ---- 悬停物理：石头旋转 + 轻微左右滑动，离开后带物理回摆 ---- */
-    // 先在当前位置采样得到石头屏幕中心（初始 0.5 最低点）
-    // 挂点保持在上次位置（松手不回中点）
-    sampleRope(bead.u, SAMPLE);
-    if (hoverOn && !stoneDrag) {
-      stoneCenterWorld(hoverScr).project(camera);
-      const hx = (hoverScr.x * 0.5 + 0.5) * canvas.clientWidth;
-      const hy = (-hoverScr.y * 0.5 + 0.5) * canvas.clientHeight;
-      hov.ty = clamp((lastPx - hx) * 0.0055, -2.2, 2.2);   // 左右旋转（幅度略小）
-      hov.tx = clamp((lastPy - hy) * 0.0055, -2.2, 2.2);  // 上下翻转：鼠标在上->朝上，在下->朝下
-      hov.ts = clamp((lastPx - hx) * 0.0005, -0.07, 0.07); // 左右沿链稍滑(小)
-    } else {
-      hov.ty = 0; hov.tx = 0; hov.ts = 0;
-    }
-    // 弹簧积分（带回摆）：刚度 K、阻尼 C
-    hov.y += hov.vy * dt;  hov.vy += ((hov.ty - hov.y) * 140 - hov.vy * 12) * dt;
-    hov.x += hov.vx * dt;  hov.vx += ((hov.tx - hov.x) * 140 - hov.vx * 12) * dt;
-    hov.s += hov.vs * dt;  hov.vs += ((hov.ts - hov.s) * 55 - hov.vs * 8) * dt;
-    // 松手后：扣子沿链子滑向最低点（重力切向 + 摩擦 → 过冲、来回摆动、最后停稳）
-    if (!grabbed) {
-      const aAlong = -rope.gravity * 4.6 * SAMPLE.ty;   // 重力切向分量 ×4.6（滑得更快；想更快就调这个倍数，而不是 g）
-      bead.v += aAlong * dt;
-      bead.v -= bead.v * 6.0 * dt;                      // 空气阻尼：摆动几下后停下
-      if (Math.abs(bead.v) > 0.02) {
-        bead.v -= Math.sign(bead.v) * SLIDE_FRICTION * dt;   // 动摩擦
-      } else if (Math.abs(aAlong) < SLIDE_STATIC) {
-        bead.v = 0;                                          // 链子太平时停住，防抖
-      }
-      bead.v = clamp(bead.v, -SLIDE_VMAX, SLIDE_VMAX);
-      bead.u = clamp(bead.u + (bead.v * dt) / SAMPLE.L, 0.02, 0.98);
-      if ((bead.u <= 0.02 && bead.v < 0) || (bead.u >= 0.98 && bead.v > 0)) bead.v = 0;
-      sampleRope(bead.u, SAMPLE);
-    }
-    sampleRope(bead.u, SAMPLE);
-
-    /* ---- 吊坠：三维球面摆 + 绕竖轴扭转（自己带自由度，不再钉死在链切线方向）---- */
-    const dts = Math.max(dt, 1e-4);
-    if (!pend.init) { pend.lastPos.set(SAMPLE.x, SAMPLE.y, SAMPLE.z); pend.lastVel.set(0, 0, 0); pend.init = true; }
-    // 挂点的速度/加速度：拖链子时吊坠因惯性滞后、被甩动
-    attachVel.set((SAMPLE.x - pend.lastPos.x) / dts, (SAMPLE.y - pend.lastPos.y) / dts, (SAMPLE.z - pend.lastPos.z) / dts);
-    attachAccel.copy(attachVel).sub(pend.lastVel).multiplyScalar(1 / dts);
-    pend.accel.lerp(attachAccel, 1 - Math.exp(-12 * dt));
-    pend.lastPos.set(SAMPLE.x, SAMPLE.y, SAMPLE.z);
-    pend.lastVel.copy(attachVel);
-    // 方向反转检测（例：沿链子向左滑 → 突然向右滑）：反转瞬间放大惯性 → 那一瞬间甩得更明显
-    const slideV = bead.v;
-    pend.maxV = Math.max(Math.abs(slideV), pend.maxV * Math.exp(-6 * dt));   // 最近速度记忆(约0.2s)
-    if (pend.prevSlideV * slideV < 0 && pend.maxV > 1.0) {                   // 方向反转（用记忆判断，避免平滑过零判不到）
-      pend.revBoost = PEND.reversalBoost;
-      pend.revKick = clamp(pend.maxV * 2.6, 0, 6.5) * (PEND.reversalBoost / 13.0);   // 反转角冲量：决定那一下甩多狠
-    }
-    pend.prevSlideV = slideV;
-    pend.revBoost += (1 - pend.revBoost) * (1 - Math.exp(-PEND.revDecay * dt));
-
-    // 有效“上”方向 = 重力 + 挂点加速度（惯性）→ 吊坠会朝运动反方向甩开
-    effUp.copy(UP2).addScaledVector(pend.accel, -(PEND.inertia * pend.revBoost) / rope.gravity);   // 用当前 g 归一化，换 g 不改变甩动幅度   // 惯性方向（负号：坠体与运动同向甩）
-    if (effUp.lengthSq() < 1e-8) effUp.copy(UP2); else effUp.normalize();
-    // 链子切线 & 参考正面（绕竖轴扭转的目标）
-    // 用世界竖直方向做参考，避免松手瞬间的挂点加速度把石头扭到侧面
-    chainTang.set(SAMPLE.tx, SAMPLE.ty, SAMPLE.tz);
-    if (chainTang.lengthSq() < 1e-10) chainTang.set(0, 1, 0); else chainTang.normalize();
-    chainSide.crossVectors(chainTang, UP2);
-    if (chainSide.lengthSq() < 1e-10) chainSide.set(0, 0, 1); else chainSide.normalize();
-
-    pendUp.set(0, 1, 0).applyQuaternion(pend.q);
-    if (stoneDrag) {
-      // 抓住时：保持抓取瞬间的朝向
-      pend.q.copy(stoneFreezeQuat);
-      pend.omega.set(0, 0, 0);
-    } else {
-      // 反转冲量：突然反向时直接给一个角速度（那一瞬间甩得更狠）
-      if (pend.revKick > 0) {
-        // 沿着“当前倾斜方向”再加一把 → 反转那一瞬间摆幅明显变大
-        tiltAxis.crossVectors(pendUp, UP2);
-        if (tiltAxis.lengthSq() > 1e-8) pend.omega.addScaledVector(tiltAxis.normalize(), -pend.revKick);
-        pend.revKick = 0;
-      }
-      // ① 重力回正：把吊坠的“上”转向有效上方向（球面摆，任意方向都能摆）
-      torque.crossVectors(pendUp, effUp).multiplyScalar(PEND.sway);
-      // ② 摆动阻尼
-      torque.addScaledVector(pend.omega, -PEND.damping);
-      // ③ 绕竖轴的扭转：正面回到参考朝向，带扭转阻尼
-      pendSide.set(0, 0, 1).applyQuaternion(pend.q);
-      twistAxis.crossVectors(pendSide, chainSide);
-      const twistErr = twistAxis.dot(effUp);
-      torque.addScaledVector(effUp, twistErr * PEND.twistSpring - pend.omega.dot(effUp) * PEND.twistDamping);
-      // ④ 主动运动量：前后摆动（绕链方向轴）+ 左右转动（绕竖轴），量可调（设 0 即关闭）
-      torque.addScaledVector(chainTang, Math.sin(t * PEND.motionFreq) * PEND.frontBack);
-      torque.addScaledVector(effUp, Math.sin(t * PEND.motionFreq * 0.7 + 1.3) * PEND.spin);
-      // 积分角速度 + 应用（世界坐标系的角速度）
-      pend.omega.addScaledVector(torque, dt);
-      if (pend.omega.lengthSq() > PEND.maxOmega * PEND.maxOmega) pend.omega.setLength(PEND.maxOmega);
-      pend.omega.multiplyScalar(Math.exp(-0.2 * dt));
-      dq.set(pend.omega.x * dt * 0.5, pend.omega.y * dt * 0.5, pend.omega.z * dt * 0.5, 1).normalize();
-      pend.q.premultiply(dq).normalize();
-    }
-
-    if (!stoneDrag) {
-      // ---- 硬限制：倾斜 ≤ maxTiltDeg，左右旋转 ≤ maxYawDeg ----
-      pendUp.set(0, 1, 0).applyQuaternion(pend.q);
-      const tiltDeg = Math.acos(clamp(pendUp.y, -1, 1)) * 180 / Math.PI;
-      pend.lastTilt = tiltDeg;
-      if (tiltDeg > PEND.maxTiltDeg) {
-        clampAxis.crossVectors(pendUp, UP2);
-        if (clampAxis.lengthSq() > 1e-10) {
-          clampAxis.normalize();
-          clampQ.setFromAxisAngle(clampAxis, (tiltDeg - PEND.maxTiltDeg) * Math.PI / 180);
-          pend.q.premultiply(clampQ).normalize();
-          pend.omega.multiplyScalar(0.6);   // 撞到上限时顺便卸掉一点角速度，避免顶住抖
-        }
-      }
-      // 左右旋转（绕竖轴）限制：以链子侧面方向为目标
-      pendUp.set(0, 1, 0).applyQuaternion(pend.q);
-      pendSide.set(0, 0, 1).applyQuaternion(pend.q);
-      aimSide.copy(chainSide).addScaledVector(pendUp, -chainSide.dot(pendUp));
-      if (aimSide.lengthSq() > 1e-10) {
-        aimSide.normalize();
-        clampAxis.crossVectors(pendSide, aimSide);
-        const yaw = Math.atan2(clampAxis.dot(pendUp), pendSide.dot(aimSide)) * 180 / Math.PI;
-        pend.lastYaw = yaw;
-        if (Math.abs(yaw) > PEND.maxYawDeg) {
-          const excess = (Math.abs(yaw) - PEND.maxYawDeg) * Math.PI / 180 * Math.sign(yaw);
-          clampQ.setFromAxisAngle(pendUp, excess);
-          pend.q.premultiply(clampQ).normalize();
-          // 不是停在边界：把向外的扭转速度反射回来，形成回弹
-          const yawVel = pend.omega.dot(pendUp);
-          if (yaw * yawVel < 0) {
-            pend.omega.addScaledVector(pendUp, -yawVel * (1 + PEND.yawRestitution));
-          }
-        }
-      }
-    }
-    pendantAnchor.quaternion.copy(pend.q);
-    pendUp.set(0, 1, 0).applyQuaternion(pend.q);
-    pendantAnchor.position.set(SAMPLE.x, SAMPLE.y, SAMPLE.z).addScaledVector(pendUp, -PENDANT_GAP);
-    if (stoneDrag) pendantAnchor.position.copy(stoneTarget);   // 石头=手
     /* ---- 氛围动画 ---- */
     if (sparkles) {
       sparkles.rotation.y = t * 0.05;
@@ -772,30 +798,7 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
   }
   tick();
 }
-/* ============================================================
-   临时向量池
-   ============================================================ */
-const DOWN = new THREE.Vector3(0, -1, 0);
 const UP2 = new THREE.Vector3(0, 1, 0);
-const hang = new THREE.Vector3();
-const side = new THREE.Vector3();
-const basis = new THREE.Matrix4();
-const targetQuat = new THREE.Quaternion();
-const pendUp = new THREE.Vector3();
-const pendSide = new THREE.Vector3();
-const chainTang = new THREE.Vector3();
-const chainSide = new THREE.Vector3();
-const attachVel = new THREE.Vector3();
-const attachAccel = new THREE.Vector3();
-const effUp = new THREE.Vector3();
-const torque = new THREE.Vector3();
-const twistAxis = new THREE.Vector3();
-const tiltAxis = new THREE.Vector3();
-const clampAxis = new THREE.Vector3();
-const aimSide = new THREE.Vector3();
-const clampQ = new THREE.Quaternion();
-const dq = new THREE.Quaternion();
-const pend = { q: new THREE.Quaternion(), omega: new THREE.Vector3(), accel: new THREE.Vector3(), lastPos: new THREE.Vector3(), lastVel: new THREE.Vector3(), prevSlideV: 0, revBoost: 1, revKick: 0, maxV: 0, init: false };
 /* ============================================================
    吊坠模型：Blender GLB 加载 / 程序化兜底
    ============================================================ */
@@ -916,6 +919,7 @@ function buildKitePendant(chainSilver, silver, stoneFront, stoneBack, stoneSide)
   ring.rotation.y = Math.PI / 2;   // 面朝左/右（法线沿 X），链子从环心穿过
   ring.scale.y = 1.3;              // 短一些（竖椭圆）
   ring.position.y = -0.09;         // 长一点后仍贴链子
+  ring.userData.role = 'bail';
   g.add(ring);
   /* —— 蓝色拉长石主石：风筝形，上短下长；拆成前/后/侧，各贴各的图 —— */
   const T = 0.20, B = 0.52, W = 0.30;
@@ -931,10 +935,10 @@ function buildKitePendant(chainSilver, silver, stoneFront, stoneBack, stoneSide)
   gemGeo.computeBoundingBox();
   const gemCenter = gemGeo.boundingBox.getCenter(new THREE.Vector3());
   const faces = splitStoneFaces(gemGeo, 0.35);
-  const off = { x: -gemCenter.x, y: -0.16 - T, z: -gemCenter.z };   // 石头下来一点；X/Z 对齐扣环中心
-  const front = new THREE.Mesh(faces.front, stoneFront); front.position.set(off.x, off.y, off.z); g.add(front);
-  const back = new THREE.Mesh(faces.back, stoneBack);   back.position.set(off.x, off.y, off.z); g.add(back);
-  const side = new THREE.Mesh(faces.side, stoneSide);   side.position.set(off.x, off.y, off.z); g.add(side);
+  const off = { x: -gemCenter.x, y: -0.16 - T + PEND.stoneLift, z: -gemCenter.z };   // 石头靠近扣环；X/Z 对齐扣环中心
+  const front = new THREE.Mesh(faces.front, stoneFront); front.position.set(off.x, off.y, off.z); front.userData.role = 'stone'; g.add(front);
+  const back = new THREE.Mesh(faces.back, stoneBack);   back.position.set(off.x, off.y, off.z); back.userData.role = 'stone'; g.add(back);
+  const side = new THREE.Mesh(faces.side, stoneSide);   side.position.set(off.x, off.y, off.z); side.userData.role = 'stone'; g.add(side);
   return g;
 }
 function normalizePendant(group, targetH) {

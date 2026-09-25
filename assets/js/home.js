@@ -520,7 +520,10 @@ function initOpeningTransition() {
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     const hero = opening.querySelector('.hero');
     const slogan = opening.querySelector('.slogan');
-    const pieces = slogan.querySelectorAll('.fold-text-piece');
+    const sloganCenter = slogan.querySelector('.slogan__center');
+    const sloganCenterNext = sloganCenter && sloganCenter.nextSibling;
+    const sloganSub = sloganCenter && sloganCenter.querySelector('.slogan__sub');
+    const pieces = sloganCenter ? sloganCenter.querySelectorAll('.fold-text-piece') : [];
     const necklace = hero.querySelector('.hero__stage');
     const necklaceNext = necklace && necklace.nextSibling;
     // Keep the same live canvas and physics instance above both scenes.
@@ -530,6 +533,9 @@ function initOpeningTransition() {
       labels.forEach(label => hero.appendChild(label));
       opening.querySelector('.opening__stage').appendChild(necklace);
     }
+    // The black slogan scene opens beneath the necklace, while its message sits
+    // above the necklace as an independent overlay.
+    if (sloganCenter) opening.querySelector('.opening__stage').appendChild(sloganCenter);
     opening.classList.add('opening--animated');
     const timeline = gsap.timeline({
       defaults: { ease: 'none' },
@@ -547,11 +553,11 @@ function initOpeningTransition() {
       .fromTo(slogan, { clipPath: 'polygon(50% 55%,50% 55%,50% 55%,50% 55%)' },
         { clipPath: 'polygon(50% 37%,50.3% 55%,50% 73%,49.7% 55%)', duration: 0.14 }, 0.04)
       .to(slogan, { clipPath: 'polygon(50% -65%,170% 55%,50% 175%,-70% 55%)', duration: 0.54, ease: 'power2.inOut' }, 0.18)
-      .fromTo(slogan.querySelector('.slogan__center'), { y: 48, scale: 0.94 }, { y: 0, scale: 1, duration: 0.4 }, 0.48)
+      .fromTo(sloganCenter, { y: 48, scale: 0.94 }, { y: 0, scale: 1, duration: 0.4 }, 0.48)
       .fromTo(pieces, { opacity: 0, rotateX: -85, '--fold-crease': 0.45 },
         { opacity: 1, rotateX: 0, '--fold-crease': 0, stagger: 0.009, duration: 0.22, ease: 'power2.out' }, 0.48)
       .fromTo(slogan.querySelector('.slogan__marquee'), { yPercent: -105, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.18 }, 0.68)
-      .fromTo(slogan.querySelector('.slogan__sub'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.16 }, 0.76)
+      .fromTo(sloganSub, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.16 }, 0.76)
       .to({}, { duration: 0.12 });
     if (necklace) {
       timeline.fromTo(necklace, { opacity: 1 },
@@ -559,6 +565,7 @@ function initOpeningTransition() {
     }
     return () => {
       opening.classList.remove('opening--animated');
+      if (sloganCenter) slogan.insertBefore(sloganCenter, sloganCenterNext);
       if (necklace) {
         hero.insertBefore(necklace, necklaceNext);
         labels.forEach(label => necklace.appendChild(label));
