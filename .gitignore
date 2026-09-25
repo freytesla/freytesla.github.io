@@ -5,3 +5,4 @@ output/gltf-opt/
 .playwright-cli/
 debug.log
 output/playwright/
+网站图片/**/*.MOV
