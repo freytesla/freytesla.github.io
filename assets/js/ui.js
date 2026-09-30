@@ -191,7 +191,8 @@
 
   /* ---------------- Lenis smooth scroll ---------------- */
   function initLenis() {
-    if (reduced || !window.Lenis) return;
+    // 滑动阻尼对所有人开启：不再因 prefers-reduced-motion 关闭平滑滚动。
+    if (!window.Lenis) return;
     var lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
@@ -237,7 +238,7 @@
       if (!track || track.dataset.marquee === '1') return;
       track.dataset.marquee = '1';
       track.style.animation = 'none';      // JS drives the loop; CSS anim stays as no-JS fallback
-      if (reduced) return;                 // reduced motion -> static
+      // 跑马灯对所有访客滚动（不再因 prefers-reduced-motion 停住）
       var base = parseFloat(row.dataset.speed) || 30;   // px/sec
       var slow = parseFloat(row.dataset.slow) || 0.15;  // hover speed ratio
       var speed = base, target = base, x = 0, last = performance.now();
@@ -266,7 +267,7 @@
   /* ---------------- Reveal on scroll ---------------- */
   function initReveal() {
     var els = document.querySelectorAll('[data-reveal]');
-    if (!('IntersectionObserver' in window) || reduced) {
+    if (!('IntersectionObserver' in window)) {
       els.forEach(function (el) { el.classList.add('is-in'); });
       return;
     }

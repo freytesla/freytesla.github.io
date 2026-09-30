@@ -10,7 +10,7 @@ body{ background:var(--bg); color:var(--paper); }
 @media (max-width:900px){ .ask-main{ grid-template-columns:1fr; padding-top:130px; } }
 
 .ask-left{ display:flex; flex-direction:column; align-items:flex-start; gap:20px; }
-.ask-title{ font-size:clamp(44px,6.4vw,96px); letter-spacing:-.03em; }
+.ask-title{ font-size:clamp(38px,min(5.6vw,8.5vh),84px); letter-spacing:-.03em; }
 .ask-sub{ font-size:var(--fs-lead); color:var(--muted-paper); line-height:1.7; }
 .ask-chips{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
 .chip{

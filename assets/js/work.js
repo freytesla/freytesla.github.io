@@ -38,7 +38,7 @@
   }
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
-  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  gsap.matchMedia().add('(min-width: 0px)', () => {
     gsap.to('.work-hero__bgtext', { y: -70, opacity: 0,
       scrollTrigger: { trigger: '.work-hero', start: 'top top', end: 'bottom top', scrub: true } });
     projects.forEach(card => {

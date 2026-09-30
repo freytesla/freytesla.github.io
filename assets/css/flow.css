@@ -42,7 +42,7 @@ main{ overflow:clip; }
 }
 .choose > .wrap{ display:flex; flex-direction:column; justify-content:flex-start; }
 #choose .sec-head{ margin-bottom:clamp(12px,2vh,24px); }
-#choose .sec-head__title{ font-size:clamp(42px,5.2vw,78px); }
+#choose .sec-head__title{ font-size:clamp(36px,min(4.8vw,7vh),70px); }
 #choose .card{
   min-height:clamp(350px,48vh,450px);
   padding:clamp(18px,2.2vw,34px);
@@ -55,11 +55,16 @@ main{ overflow:clip; }
   align-items:center;
 }
 #choose .card__art svg{ width:100%; height:100%; }
-#choose .card__title{ margin-top:0; font-size:clamp(40px,4.8vw,70px); }
+#choose .card__title{ margin-top:0; font-size:clamp(34px,min(4.4vw,6.5vh),64px); }
 #choose .choose__note{ margin-top:clamp(10px,1.8vh,20px); }
 .painting-room{ padding-top:clamp(90px,12vh,140px); }
 .site-foot{
-  padding-top:clamp(76px,11vh,126px);
+  /* 与 .outro 一致：尾部区块约占 0.5 视口高。内容自然高约 340px，
+     不足的差额由 min-height 补足（留在底部，深色页脚上不可见）。
+     注意：不能改成 flex 居中 —— 子元素是 .wrap{max-width:1440px;margin:0 auto}，
+     成为 flex item 后 auto 外边距会取消 align-items:stretch，网格会塌成内容宽。 */
+  min-height:50svh;
+  padding-top:clamp(16px,2.5vh,32px);
   padding-inline:clamp(42px,10vw,190px);
 }
 .site-foot__top{
@@ -73,18 +78,18 @@ main{ overflow:clip; }
   justify-self:center;
 }
 .site-foot .social-link{
-  padding-block:clamp(12px,1.5vh,18px);
-  font-size:clamp(14px,1.25vw,20px);
+  padding-block:clamp(6px,1vh,12px);
+  font-size:clamp(13px,1.05vw,16px);
 }
 .outro{
-  min-height:80svh;
+  min-height:50svh;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  padding:clamp(64px,9vh,108px) clamp(54px,9vw,180px);
+  padding:clamp(20px,3.5vh,44px) clamp(54px,9vw,180px);
 }
-.outro__next{ font-size:clamp(76px,12vw,180px); }
-.outro__bar{ margin-top:clamp(30px,5vh,50px); }
+.outro__next{ font-size:clamp(52px,min(10.5vw,15vh),148px); }
+.outro__bar{ margin-top:clamp(16px,2.5vh,28px); }
 
 .hobby-sec,
 .project-studies{
@@ -146,8 +151,8 @@ main{ overflow:clip; }
 }
 .ask-left,.ask-right{ grid-column:auto; }
 .ask-section .ask-left{ gap:14px; }
-.ask-section .ask-title{ font-size:clamp(54px,7.2vw,104px); }
-.ask-section .ask-sub{ font-size:clamp(18px,1.7vw,25px); }
+.ask-section .ask-title{ font-size:clamp(42px,min(6.2vw,9vh),88px); }
+.ask-section .ask-sub{ font-size:clamp(16px,min(1.6vw,2.4vh),22px); }
 .ask-section .ask-chips{ gap:6px; margin-top:0; }
 .ask-section .chip{ padding:5px 14px; }
 .ask-section .ask-btn{ margin-top:4px; }

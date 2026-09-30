@@ -4,7 +4,7 @@
   function boot() {
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
-    gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+    gsap.matchMedia().add('(min-width: 0px)', () => {
       const cleanups = [];
       const notify = () => window.dispatchEvent(new Event('frey:scene-frame'));
       const scroll = (trigger, start = 'top 90%', end = 'top 38%') => ({ trigger, start, end, scrub: 0.45, invalidateOnRefresh: true });

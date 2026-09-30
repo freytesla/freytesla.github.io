@@ -7,17 +7,17 @@ body{ background:var(--bg); color:var(--paper); }
 .hobby-hero__bgtext{
   position:absolute; left:var(--space); top:clamp(84px,12vh,140px);
   transform:none; text-align:left;
-  font-size:clamp(64px,11vw,190px); letter-spacing:-.02em; white-space:nowrap;
+  font-size:clamp(52px,min(9.5vw,14vh),140px); letter-spacing:-.02em; white-space:nowrap;
   color:transparent; -webkit-text-stroke:1px rgba(245,246,241,.24);
   pointer-events:none; user-select:none; z-index:0;
 }
 .hobby-hero .wrap{ position:relative; z-index:1; }
-.hobby-hero__title{ font-size:clamp(44px,8vw,130px); letter-spacing:-.03em; margin-top:14px; }
+.hobby-hero__title{ font-size:clamp(36px,min(6.8vw,10.5vh),96px); letter-spacing:-.03em; margin-top:14px; }
 .hobby-hero__sub{ margin-top:18px; font-size:var(--fs-micro); letter-spacing:.34em; color:var(--muted-paper); }
 
 .hobby-sec{ padding-bottom:clamp(70px,12vh,150px); }
 .hobby-sec + .hobby-sec{ border-top:1px solid var(--line-dark); }
-.hobby-sec__title{ font-size:clamp(34px,5vw,72px); margin-top:8px; letter-spacing:-.02em; }
+.hobby-sec__title{ font-size:clamp(30px,min(4.5vw,6.5vh),62px); margin-top:8px; letter-spacing:-.02em; }
 
 
 /* ---------- F1 ---------- */

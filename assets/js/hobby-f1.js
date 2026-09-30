@@ -375,7 +375,7 @@ if ('IntersectionObserver' in window) {
 
 /* ---------------- render loop ---------------- */
 /* turntable auto-spin (rad/s): keeps turning, only paused while dragging */
-const AUTO_SPIN = reduced ? 0.22 : 0.42;
+const AUTO_SPIN = 0.42;   // 自转速度对所有访客一致（原先 reduced-motion 会减半）
 let lastFrameT = performance.now();
 
 function frame(now) {

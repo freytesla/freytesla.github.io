@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    FREY v2 — base design system
    配色: Marrs Green #01847F / Black / White
    Fonts: Syne / Space Grotesk / Space Mono / Bricolage Grotesque —— 拉丁字集已自托管到 ../fonts (OFL)
@@ -110,10 +110,10 @@
   --fs-micro: 10px;
   --fs-label: 12px;
   --fs-small: 13px;
-  --fs-body:  clamp(15px, 1.05vw, 17px);
-  --fs-lead:  clamp(18px, 1.6vw, 24px);
-  --fs-title: clamp(42px, 7vw, 104px);
-  --fs-hero:  clamp(76px, 17vw, 280px);
+  --fs-body:  clamp(15px, min(1.05vw, 1.9vh), 17px);
+  --fs-lead:  clamp(17px, min(1.6vw, 2.6vh), 24px);
+  --fs-title: clamp(36px, min(7vw, 10vh), 96px);
+  --fs-hero:  clamp(64px, min(17vw, 24vh), 240px);
 
   --lh-tight: .98;
   --lh-body: 1.65;
@@ -230,7 +230,7 @@ body[data-theme="dark"]{ background:var(--bg); color:var(--paper); }
 
 .loader__word{
   display:flex; gap:.08em; margin-top:22px; overflow:hidden;
-  font-family:var(--font-display); font-size:clamp(54px,11vw,150px); font-weight:800;
+  font-family:var(--font-display); font-size:clamp(46px,min(9.5vw,14vh),118px); font-weight:800;
   letter-spacing:-.02em; line-height:1;
 }
 .loader__word span{ display:inline-block; transform:translateY(120%); animation:loader-in .7s var(--ease-out) forwards; }
@@ -352,7 +352,7 @@ body:not(.menu-open) .site-head--adaptive .head-cta:hover{ color:var(--paper); }
 .mq-item{
   display:flex; align-items:center; gap:14px; padding-right:34px;
   font-family:var(--font-display); font-weight:800;
-  font-size:clamp(28px,4vw,52px); letter-spacing:-.02em; white-space:nowrap;
+  font-size:clamp(24px,min(3.6vw,5.5vh),46px); letter-spacing:-.02em; white-space:nowrap;
   line-height:1; font-weight:700; color:var(--muted);
 }
 .mq-item .dot{ width:10px; height:10px; border-radius:50%; background:var(--green-400); flex-shrink:0; }
@@ -411,7 +411,7 @@ body[data-theme="dark"] .btn--solid:hover{ color:var(--ink); }
 .sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:clamp(34px,5vh,64px); }
 body[data-theme="dark"] .sec-head{ border-color:var(--line-dark); }
 .sec-head__num{ font-family:var(--font-mono); font-size:var(--fs-micro); letter-spacing:.3em; color:var(--green); }
-.sec-head__title{ font-size:clamp(30px,4.6vw,64px); letter-spacing:-.02em; }
+.sec-head__title{ font-size:clamp(26px,min(4.2vw,6vh),56px); letter-spacing:-.02em; }
 .sec-head__sub{ font-family:var(--font-mono); font-size:var(--fs-small); letter-spacing:.14em; text-transform:uppercase; color:var(--muted-ink); text-align:right; max-width:340px; line-height:1.7; }
 body[data-theme="dark"] .sec-head__sub{ color:var(--muted-paper); }
 
@@ -461,9 +461,9 @@ body[data-theme="dark"] .corner-label{ color:var(--muted-paper); }
 /* ============================================================
    Footer / contact
    ============================================================ */
-.site-foot{ position:relative; background:var(--bg); color:var(--paper); padding:clamp(70px,12vh,140px) var(--space) 34px; overflow:hidden; }
+.site-foot{ position:relative; background:var(--bg); color:var(--paper); padding:clamp(70px,12vh,140px) var(--space) 20px; overflow:hidden; }
 .site-foot__top{ display:flex; flex-wrap:wrap; gap:clamp(28px,5vw,80px); align-items:flex-start; justify-content:space-between; }
-.site-foot__lead{ font-size:clamp(44px,8vw,120px); line-height:.98; letter-spacing:-.03em; }
+.site-foot__lead{ font-size:clamp(32px,min(5vw,7.5vh),64px); line-height:.98; letter-spacing:-.03em; }
 .site-foot__lead .green{ color:var(--green); }
 .site-foot__socials{ display:flex; flex-direction:column; gap:6px; }
 .social-link{
@@ -474,13 +474,13 @@ body[data-theme="dark"] .corner-label{ color:var(--muted-paper); }
 .social-link .idx{ color:var(--green-400); }
 .social-link:hover{ opacity:1; transform:translateX(8px); color:var(--green-200); }
 .site-foot__bottom{
-  margin-top:clamp(50px,9vh,100px); padding-top:22px; border-top:1px solid var(--line-dark);
+  margin-top:clamp(12px,2vh,22px); padding-top:16px; border-top:1px solid var(--line-dark);
   display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
   font-family:var(--font-mono); font-size:var(--fs-micro); letter-spacing:.24em; text-transform:uppercase; color:var(--muted-paper);
 }
 .site-foot__watermark{
   position:absolute; left:50%; bottom:-6%; transform:translateX(-50%);
-  font-family:var(--font-display); font-weight:800; font-size:clamp(120px,26vw,420px); letter-spacing:-.04em;
+  font-family:var(--font-display); font-weight:800; font-size:clamp(88px,min(21vw,28vh),300px); letter-spacing:-.04em;
   color:transparent; -webkit-text-stroke:1.6px rgba(245,246,241,.1); pointer-events:none; white-space:nowrap;
   user-select:none;
   -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 16%, #000 84%, rgba(0,0,0,0) 100%);
@@ -521,7 +521,7 @@ body[data-theme="dark"] .page-nav .muted{ color:var(--muted-paper); }
 .outro__next{
   display:inline-flex; align-items:baseline; gap:clamp(14px,2vw,30px);
   margin-top:16px;
-  font-size:clamp(72px,14vw,210px); letter-spacing:-.03em; line-height:.95;
+  font-size:clamp(50px,min(11vw,16vh),146px); letter-spacing:-.03em; line-height:.95;
   color:var(--paper);
 }
 .outro__next-t{
@@ -571,7 +571,7 @@ body[data-theme="dark"] .page-nav .muted{ color:var(--muted-paper); }
   gap:14px; transform:translateY(-2px);
 }
 @media (max-width:560px){
-  .outro__next{ font-size:clamp(46px,15vw,120px); }
+  .outro__next{ font-size:clamp(38px,min(12vw,15vh),92px); }
   .outro__bar{ justify-content:flex-start; }
   .outro__back{ padding:12px 16px; }
 }
@@ -590,11 +590,12 @@ body[data-theme="dark"] .page-nav .muted{ color:var(--muted-paper); }
 }
 @keyframes hint-drop{ 0%{ transform:translateY(0);} 70%,100%{ transform:translateY(60px);} }
 
-/* accessibility: reduced motion */
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{ animation-duration:.001s !important; transition-duration:.001s !important; }
-  [data-reveal]{ opacity:1 !important; transform:none !important; }
-}
+/* 注：这里原有一条 @media (prefers-reduced-motion:reduce) 规则，用于在
+   reduced-motion 下关闭全站动画。它本身是坏的：
+     animation-duration:.001s 会让 infinite 动画每秒循环 1000 次（剧烈抽搐）；
+     再补 animation-iteration-count:1 又会让动画永久冻结。
+   而且全站动效现已对所有人开放（3D 项链 / 滚动阻尼 / 菱形转场 / 滚动叙事），
+   该规则与之一致性冲突，故整条移除。 */
 
 /* ===== shared utilities ===== */
 .mono{ font-family:var(--font-mono); letter-spacing:.14em; text-transform:uppercase; }

@@ -108,7 +108,7 @@
     var pieces = Array.from(root.querySelectorAll('.fold-text-piece'));
     if (!pieces.length) return { destroy: function () {} };
 
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduceMotion = false;   // 全站动画对所有人开放，不再按 reduced-motion 降级
     var activeDuration = reduceMotion ? Math.min(duration, 0.22) : duration;
     var activeStagger = reduceMotion ? Math.min(stagger, 0.02) : stagger;
     var fromVars = {

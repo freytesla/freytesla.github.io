@@ -195,8 +195,10 @@ function staticFallback(reason) {
   img.style.cssText = 'position:absolute;inset:0;margin:auto;width:52%;height:auto;opacity:.8;';
   wrap.appendChild(img);
 }
-if (reduced || !webglOK()) {
-  staticFallback(reduced ? 'prefers-reduced-motion' : 'no WebGL');
+// 所有人都应看到 3D 拉长石：不再因 prefers-reduced-motion 降级为静态占位图，
+// 只有浏览器真的不支持 WebGL 时才兜底。
+if (!webglOK()) {
+  staticFallback('no WebGL');
 } else {
   init();
 }
@@ -206,7 +208,14 @@ if (reduced || !webglOK()) {
 async function init() {
   /* ---- renderer ---- */
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));   // 上限 1.5：高分屏省掉近一半像素
+  // 低内存设备上浏览器会回收 WebGL 上下文（画布变空白且不再自己恢复）。
+  // preventDefault 是让上下文能被恢复的前提。
+  renderer.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); }, false);
+  renderer.domElement.addEventListener('webglcontextrestored', () => {
+    // 上下文恢复后重新适配尺寸并重置计时，否则项链会停在错误的比例/位置
+    resize(); last = performance.now();
+  }, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene();
@@ -733,6 +742,10 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
   resize();
   window.addEventListener('resize', resize);
   if (window.ResizeObserver) new ResizeObserver(resize).observe(wrap);
+  // hero → slogan 转场会把 #necklace 在 .hero 与 .opening__stage 之间搬运，
+  // 并让 #opening 变成 245svh 的 sticky 舞台：承载块一变，相机就必须重新适配，
+  // 否则滚动返回后项链会停在错误的缩放/位置上。转场在各关键节点派发此事件。
+  window.addEventListener('frey:necklace-refit', resize);
   /* ---- offscreen pause ---- */
   let visible = true;
   const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; }, { threshold: 0.05 });
@@ -748,6 +761,8 @@ const hov = { x: 0, y: 0, vx: 0, vy: 0, s: 0, vs: 0, tx: 0, ty: 0, ts: 0 };   //
     let dt = (now - last) / 1000;
     last = now;
     if (dt > 0.05) dt = 0.05;          // 后台标签页回来时防止爆炸
+    // 离屏时既不推进物理也不渲染：省掉整条链子 + 吊坠的求解，避免滚动时掉帧
+    if (!visible) return;
     const t = clock.getElapsedTime();
     // 微风已去掉：静止时链子不动，只有拖动/链子物理会带动它
     rope.wind.x = 0; rope.wind.z = 0;

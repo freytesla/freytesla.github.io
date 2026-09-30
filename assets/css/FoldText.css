@@ -81,12 +81,4 @@
   background: linear-gradient(270deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.22) 42%, rgba(255, 255, 255, 0.26) 100%);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .fold-text-piece {
-    transform: none !important;
-  }
-
-  .fold-text-piece::after {
-    opacity: 0 !important;
-  }
-}
+/* 原此处 reduced-motion 会压平折角并去掉折痕阴影（等于没有折字效果），已移除。 */

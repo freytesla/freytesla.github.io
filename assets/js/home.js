@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    FREY v2 — home: 3D necklace / slogan roller / photo wall
    three.js 由 <script src="assets/vendor/three.min.js"> 提供全局 THREE（UMD）
    —— 不依赖 ES Module，file:// 直接双击打开也能工作
@@ -431,7 +431,7 @@ function initPhotoWall() {
     button.addEventListener('click', () => window.FreyViewer?.open(collection, index, button));
   });
   if (window.gsap && window.ScrollTrigger) {
-    gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+    gsap.matchMedia().add('(min-width: 0px)', () => {
       wall.querySelectorAll('.fragment').forEach((card, i) => {
         gsap.from(card, { y: 80 + i * 10, rotation: i % 2 ? 12 : -12, opacity: 0,
           scrollTrigger: { trigger: card, start: 'top 105%', end: 'top 65%', scrub: 0.5 } });
@@ -499,7 +499,9 @@ function initFoldText() {
     text: 'Launch with clarity',
     splitBy: 'char',
     hinge: 'top',
-    trigger: reduced ? 'mount' : 'manual',
+    // 原为 reduced ? 'mount' : 'manual'。'mount' 会在页面加载时就把折字播完
+    // （那时 slogan 还藏在首屏之后），访客滚到那里只看到静止结果，等于没有动画。
+    trigger: 'manual',
     duration: 0.65,
     stagger: 0.045,
     ease: 'power3.out',
@@ -517,7 +519,8 @@ function initOpeningTransition() {
   const opening = document.getElementById('opening');
   if (!opening || !window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
-  gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  // 对所有访客开启 hero → slogan 转场（不再因 prefers-reduced-motion 关闭）
+  gsap.matchMedia().add('(min-width: 0px)', () => {
     const hero = opening.querySelector('.hero');
     const slogan = opening.querySelector('.slogan');
     const sloganCenter = slogan.querySelector('.slogan__center');
@@ -537,6 +540,10 @@ function initOpeningTransition() {
     // above the necklace as an independent overlay.
     if (sloganCenter) opening.querySelector('.opening__stage').appendChild(sloganCenter);
     opening.classList.add('opening--animated');
+    // 场景布局已改变（sticky 舞台生效）：让 3D 项链重新适配相机，
+    // 否则滚动返回后它会停在错误的缩放/位置。
+    const refit = () => window.dispatchEvent(new Event('frey:necklace-refit'));
+    requestAnimationFrame(refit);
     const timeline = gsap.timeline({
       defaults: { ease: 'none' },
       onUpdate: () => window.dispatchEvent(new Event('frey:scene-frame')),
@@ -545,7 +552,8 @@ function initOpeningTransition() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 0.45,
-        invalidateOnRefresh: true
+        invalidateOnRefresh: true,
+        onRefresh: refit
       }
     });
     timeline
@@ -553,7 +561,11 @@ function initOpeningTransition() {
       .fromTo(slogan, { clipPath: 'polygon(50% 55%,50% 55%,50% 55%,50% 55%)' },
         { clipPath: 'polygon(50% 37%,50.3% 55%,50% 73%,49.7% 55%)', duration: 0.14 }, 0.04)
       .to(slogan, { clipPath: 'polygon(50% -65%,170% 55%,50% 175%,-70% 55%)', duration: 0.54, ease: 'power2.inOut' }, 0.18)
-      .fromTo(sloganCenter, { y: 48, scale: 0.94 }, { y: 0, scale: 1, duration: 0.4 }, 0.48)
+      // slogan__center 被移进 .opening__stage 当覆盖层后，不再受 .slogan 的 clip-path
+      // 裁剪；而 pieces 抓取时 FoldText 可能还没注入 .fold-text-piece（空集，永远
+      // 不会被设成透明）。所以显隐必须由容器自己控制，否则滚动进度 0 时它的文字
+      // 会透在首屏上，和 FREY 字标叠在一起。
+      .fromTo(sloganCenter, { y: 48, scale: 0.94, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.4 }, 0.48)
       .fromTo(pieces, { opacity: 0, rotateX: -85, '--fold-crease': 0.45 },
         { opacity: 1, rotateX: 0, '--fold-crease': 0, stagger: 0.009, duration: 0.22, ease: 'power2.out' }, 0.48)
       .fromTo(slogan.querySelector('.slogan__marquee'), { yPercent: -105, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.18 }, 0.68)
@@ -570,6 +582,7 @@ function initOpeningTransition() {
         hero.insertBefore(necklace, necklaceNext);
         labels.forEach(label => necklace.appendChild(label));
       }
+      requestAnimationFrame(refit);
     };
   });
 }

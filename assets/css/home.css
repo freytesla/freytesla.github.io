@@ -11,7 +11,7 @@
 }
 .hero__bgtext{
   position:absolute; left:50%; top:49%; transform:translate(-50%,-50%) scaleY(1.15);
-  margin:0; font-size:23.5vw; letter-spacing:-.04em; white-space:nowrap;
+  margin:0; font-size:min(21vw,31vh); letter-spacing:-.04em; white-space:nowrap;
   color:transparent; -webkit-text-stroke:2px #929891; line-height:.85;
   pointer-events:none; user-select:none; z-index:0;
 }
@@ -36,9 +36,9 @@
 }
 .hero__intro{ position:absolute; left:var(--space); bottom:7%; z-index:4; max-width:520px; }
 .hero__intro .mono{ font-size:12px; letter-spacing:.28em; margin-bottom:12px; }
-.hero__name{ font-size:clamp(56px,9vw,150px); letter-spacing:-.03em; }
-.hero__desc{ margin:0; font-size:clamp(18px,1.7vw,30px); color:var(--ink); line-height:1.5; }
-.hero__roles{ margin:5px 0 0; font-size:clamp(13px,1.1vw,18px); color:var(--muted-ink); }
+.hero__name{ font-size:clamp(44px,min(7.5vw,11vh),112px); letter-spacing:-.03em; }
+.hero__desc{ margin:0; font-size:clamp(16px,min(1.6vw,2.5vh),24px); color:var(--ink); line-height:1.5; }
+.hero__roles{ margin:5px 0 0; font-size:clamp(12px,min(1.05vw,1.7vh),16px); color:var(--muted-ink); }
 .hero__signature{ position:absolute; right:var(--space); top:calc(49% + 12vw); display:flex; align-items:center; gap:20px; margin:0; font-size:14px; letter-spacing:.32em; color:var(--muted-ink); }
 .hero__signature::before{ content:''; width:40px; height:1px; background:currentColor; }
 
@@ -112,12 +112,11 @@
 @media (max-width:600px){
   .opening--animated{ height:225svh; }
 }
-@media (prefers-reduced-motion:reduce){
-  .opening--animated{ height:auto; }
-  .opening--animated .opening__stage{ position:relative; height:auto; overflow:visible; }
-  .opening--animated .hero{ min-height:100svh; transform:none !important; opacity:1 !important; }
-  .opening--animated .slogan{ position:relative; min-height:100svh; clip-path:none !important; }
-}
+/* 注：原先这里有一段 prefers-reduced-motion 覆盖，用来在 reduced-motion 下
+   拆掉 .opening--animated 的 sticky 舞台布局。但转场现在对所有访客启用
+   （见 assets/js/home.js 的 initOpeningTransition），该覆盖会与 JS 打架：
+   .opening__stage 变成 height:auto 后会同时吞下 hero 与 slogan，
+   使 slogan__center 覆盖层压在首屏、项链相机适配错位。故移除。 */
 
 /* ---------- PHOTOS (black) ---------- */
 .photos{
