@@ -1,9 +1,11 @@
 /* ============================================================
    FREY v2 — home: 3D necklace / slogan roller / photo wall
-   three.js 由 <script src="assets/vendor/three.min.js"> 提供全局 THREE（UMD）
-   —— 不依赖 ES Module，file:// 直接双击打开也能工作
+   注意：首页的项链实际由 necklace-physics.js 以 ESM 方式实现
+   （three.module.js 经 importmap 引入）。本文件里的 initNecklace() 是
+   早期基于全局 THREE（UMD three.min.js）的旧实现，现已不再调用，
+   index.html 也已移除那份 607KB 的 three.min.js。
    ============================================================ */
-const THREE = window.THREE;
+const THREE = window.THREE;   // 现在恒为 undefined，仅供下方死代码引用
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function webglOK() {

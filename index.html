@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -287,7 +287,10 @@
     </div>
   </footer>
 
-<script src="assets/vendor/three.min.js"></script>
+<!-- three.min.js（607KB UMD）已移除：全局 THREE 只被 home.js 里的死代码
+     initNecklace() 使用，而首页项链实际由 necklace-physics.js 以 ESM 方式
+     加载 three.module.js。删除后省下 607KB 的下载、解析与执行，
+     同时消除控制台 "Multiple instances of Three.js" 警告。 -->
 <script src="assets/vendor/gsap.min.js"></script>
 <script src="assets/vendor/ScrollTrigger.min.js"></script>
 <script src="assets/js/FoldText.js"></script>
