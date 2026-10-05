@@ -1,0 +1,63 @@
+/* Shared typography: loaded last so every page uses the same scale. */
+:root{
+  --fs-micro:12px;
+  --fs-label:13px;
+  --fs-small:14px;
+  --fs-body:clamp(16px, calc(15px + .2vw), 18px);
+  --fs-lead:clamp(18px, calc(16px + .4vw), 22px);
+  --fs-title:clamp(32px, calc(24px + 2vw), 56px);
+  --fs-hero:clamp(40px, calc(28px + 3vw), 76px);
+  --lh-tight:1.15;
+  --lh-body:1.75;
+}
+body{ overflow-wrap:break-word; }
+h1,h2,h3,h4{ letter-spacing:-.025em; text-wrap:balance; }
+button,input,textarea,select{ font:inherit; }
+.mono{ letter-spacing:.08em; }
+.head-link,.head-cta,.btn{ letter-spacing:.08em; }
+.head-link,.head-cta{ line-height:1.5; }
+.sec-head__title,#choose .sec-head__title,.gallery__title,
+.project-studies .gallery__title,.painting-room .gallery__title,
+.hobby-sec__title,#music .hobby-sec__title,#people .hobby-sec__title,
+.fragments__intro h2,.ask-title,.ask-section .ask-title{
+  font-size:var(--fs-title); line-height:1.2; letter-spacing:-.025em;
+}
+.work-hero__title,.hobby-hero__title,.hero__name{ font-size:var(--fs-hero); line-height:1.15; }
+.card__title,#choose .card__title,.p-card__title,.project-studies .p-card__title,
+.deck__now b{ font-size:clamp(26px, calc(20px + 1.2vw), 40px); line-height:1.25; }
+.f1-intro__lead{ font-size:clamp(24px, calc(20px + .8vw), 34px); line-height:1.4; }
+.person__name,.art-viewer__info h2{ font-size:clamp(22px, calc(18px + .6vw), 28px); line-height:1.3; }
+.hero__desc,.ask-sub,.ask-section .ask-sub{ font-size:var(--fs-lead); line-height:1.7; }
+.card__desc,.p-card__desc,.project-studies .p-card__desc,.f1-intro__body,
+.person__why,.fragments__desc,.art-viewer__description{ font-size:var(--fs-body); line-height:var(--lh-body); max-width:60ch; }
+.sec-head__sub,#choose .sec-head__sub,.work-hero__sub,.hobby-hero__sub,
+.hero__roles,.choose__note,.gallery-jump{ font-size:var(--fs-small); line-height:1.75; letter-spacing:.04em; }
+.hero__intro .mono,.hero__signature,.hero__stage-hint,.hero__stage-tag,
+.slogan__sub,.photos__hint,.photos__stats,.card__num,#choose .card__num,
+.card__go,.card__tags span,.p-card__tags span,.project-studies .p-card__tags span,
+.fragment__caption,.painting-room .d-card__cap,.painting-room .gallery__foot,
+.gallery__foot,.gallery__progress,.painting-room .gallery__progress,
+.project-studies .gallery__foot,.project-number,.exhibit-action,
+.ask-note,.ask-caption,.ask-contact-links,.ticket__cap,
+.f1-intro__k,.f1-intro__meta li,.f1-intro__meta span,
+.f1-3d__hud-k,.f1-3d__hud-s,.f1-3d__load-t,
+.art-viewer__toolbar,.art-viewer__controls{
+  font-size:var(--fs-micro); line-height:1.6; letter-spacing:.06em;
+}
+.site-foot__lead{ font-size:var(--fs-title); line-height:1.2; }
+.outro__next{ font-size:var(--fs-hero); line-height:1.15; }
+.outro__meta,.outro__back,.site-foot__bottom,.scroll-hint{ letter-spacing:.08em; line-height:1.6; }
+.site-foot .social-link{ font-size:var(--fs-small); letter-spacing:.06em; line-height:1.6; }
+.sec-head,.gallery__head{ gap:24px; margin-bottom:32px; }
+.card,#choose .card{ gap:16px; }
+.ask-contact-links,.photos__stats,.ask-caption,.ticket__cap,.d-card__cap{ flex-wrap:wrap; gap:12px; }
+.chip{ max-width:100%; width:fit-content; }
+.hero__stage-hint,.photos__hint{ white-space:normal; width:max-content; max-width:calc(100% - 40px); text-align:center; }
+.err-tag{ letter-spacing:.08em; }
+@media(max-width:640px){
+  .sec-head__sub{ text-align:left; }
+  .site-foot,.outro{ padding-inline:var(--flow-gutter,22px); }
+  .head-mobile a{ font-size:30px; line-height:1.3; }
+  .hero__signature{ font-size:12px; letter-spacing:.06em; }
+  .sec-head,.gallery__head{ gap:16px; margin-bottom:24px; }
+}

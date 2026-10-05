@@ -509,7 +509,7 @@ function initFoldText() {
     ease: 'power3.out',
     perspective: 700,
     creaseShading: 0.55,
-    fontSize: 'clamp(3rem, 10vw, 7rem)',
+    fontSize: 'clamp(2rem, 6vw, 4.5rem)',
     fontWeight: 800,
     color: '#f7f2e8',
     scrollStart: 'top 55%'
