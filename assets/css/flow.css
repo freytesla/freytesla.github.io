@@ -269,3 +269,87 @@ main{ overflow:clip; }
   .fragments__wall{ grid-template-columns:repeat(2,minmax(0,1fr)); }
   .painting-room .d-card:nth-child(even){ padding-top:0; }
 }
+
+/* Content rhythm: preserve the original full-width layout and side spacing.
+   Opening stages retain their viewport geometry for scroll choreography. */
+:root{
+  --flow-gap:clamp(24px,3vw,48px);
+  --muted-ink:rgba(10,13,12,.72);
+  --muted-paper:rgba(245,246,241,.76);
+  --section-gap:clamp(48px,6vw,80px);
+}
+.section:not(.section--flush),.hobby-sec,.project-studies,.painting-room{
+  padding-block:var(--section-gap);
+}
+.work-hero,.hobby-hero{
+  min-height:0;
+  padding-top:clamp(128px,14vw,190px);
+  padding-bottom:var(--section-gap);
+}
+.choose,.photos.fragments,.ask-section,.ask-inner,.site-foot,.outro{ min-height:0; }
+.choose{ display:block; }
+.photos.fragments{ padding-block:var(--section-gap); }
+.fragments__intro{ top:100px; }
+.fragments__intro h2{ margin-block:20px; }
+.fragments__hint{ margin-top:24px; opacity:1; color:var(--muted-paper); }
+.fragments__wall{ padding:12px 8px 24px; gap:28px 20px; }
+.fragment:nth-child(even),.fragment:nth-child(3n+2){ margin-top:24px; }
+#choose .sec-head{ margin-bottom:28px; }
+#choose .card{ min-height:0; padding:clamp(24px,3vw,36px); }
+#choose .card__art{ height:140px; }
+#choose .card__go{ margin-top:12px; }
+.card__desc{ opacity:1; color:var(--muted-ink); }
+.card__tags span{ opacity:1; }
+.ask-inner{ padding-block:var(--section-gap); }
+.ask-section .ask-scene{ width:min(380px,100%); }
+.ask-note{ opacity:1; }
+.site-foot,.outro{ padding-block:var(--section-gap) 28px; }
+.site-foot__top{ gap:var(--flow-gap); }
+.site-foot__bottom{ margin-top:32px; }
+.project-studies{ grid-template-columns:1fr; gap:32px; }
+.project-studies .gallery__head{ position:relative; top:auto; }
+.project-studies .gallery__title{ margin:12px 0 0; }
+.project-studies .h-scroll__inner{ gap:40px; }
+.project-studies .p-card,.project-studies .p-card:nth-child(even){
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(24px,4vw,48px);
+  padding-top:32px;
+}
+.project-studies .p-card__art svg{ aspect-ratio:16/10; }
+.project-studies .p-card__body{ min-width:0; }
+.project-studies .gallery__foot{ grid-column:1; }
+.exhibit-action,.gallery-jump a{ min-height:44px; align-items:center; }
+.gallery-jump{ flex-wrap:wrap; gap:12px 24px; }
+.gallery-jump a{ display:inline-flex; }
+.painting-room .gallery__head{ margin-bottom:32px; padding-bottom:24px; }
+.painting-room .h-scroll__inner{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:40px 32px; }
+.painting-room .d-card:nth-child(even){ padding-top:0; }
+.painting-room .gallery__foot{ margin-top:32px; }
+.painting-room .d-card__cap{ color:var(--muted-ink); }
+.person{ min-height:0; }
+.ask-main{ min-height:0; padding:140px var(--flow-gutter) var(--section-gap); }
+.ask-scene{ max-width:100%; }
+.head-burger{ min-width:44px; min-height:44px; justify-content:center; align-items:center; }
+.btn,.deck__btn{ min-height:44px; }
+.ask-contact-links a{ display:inline-flex; align-items:center; min-height:44px; }
+.f1-3d__credit{ color:var(--muted-paper); }
+@media(max-width:900px){
+  .project-studies .p-card,.project-studies .p-card:nth-child(even){ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .fragments__intro{ position:relative; top:auto; }
+  .ask-inner,.ask-main{ gap:32px; }
+}
+@media(max-width:640px){
+  .project-studies .p-card,.project-studies .p-card:nth-child(even){ grid-template-columns:1fr; gap:20px; padding-top:24px; }
+  .painting-room .h-scroll__inner{ grid-template-columns:1fr; gap:32px; }
+  .project-studies .h-scroll__inner{ gap:32px; }
+  .fragment:nth-child(even),.fragment:nth-child(3n+2){ margin-top:16px; }
+  .fragments__wall{ padding-inline:0; gap:20px 12px; }
+  #choose .card__art{ height:112px; }
+  .art-viewer__toolbar{ flex-wrap:wrap; gap:12px; }
+  .f1-3d__credit{ top:76px; max-width:160px; }
+  .f1-3d__status{ bottom:48px; }
+  .f1-3d__hint{ left:14px; right:14px; text-align:right; }
+  .hero__intro{ bottom:12%; }
+  .hero__signature{ top:65%; }
+}
